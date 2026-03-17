@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ميزانية السفر</title>
+<style>
+:root{--pr:#1a73e8;--pr-dk:#1557b0;--ok:#34a853;--no:#ea4335;--warn:#fbbc04;--bg:#f8f9fa;--card:#fff;--txt:#202124;--txt2:#5f6368;--brd:#dadce0;--sh:0 1px 3px rgba(0,0,0,.12);--sh2:0 4px 12px rgba(0,0,0,.15);--r:12px}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:"Segoe UI","Cairo",sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;padding-bottom:80px}
+.hdr{background:linear-gradient(135deg,var(--pr),var(--pr-dk));color:#fff;padding:18px;text-align:center;position:sticky;top:0;z-index:100;box-shadow:var(--sh2)}
+.hdr h1{font-size:1.3em;margin-bottom:2px}.hdr .sub{font-size:.82em;opacity:.9}
+.trip-sel{padding:10px 14px;background:var(--card);border-bottom:1px solid var(--brd)}
+.trip-sel select{width:100%;padding:10px;border:2px solid var(--brd);border-radius:8px;font-size:1em;font-family:inherit;direction:rtl}
+.trip-sel select:focus{border-color:var(--pr);outline:none}
+.tabs{display:flex;background:var(--card);border-bottom:2px solid var(--brd);position:sticky;top:58px;z-index:99}
+.tab{flex:1;padding:10px 6px;text-align:center;cursor:pointer;font-size:.8em;font-weight:600;color:var(--txt2);border-bottom:3px solid transparent;transition:.2s}
+.tab.active{color:var(--pr);border-bottom-color:var(--pr);background:rgba(26,115,232,.05)}
+.tab-ic{font-size:1.2em;display:block;margin-bottom:1px}
+.cnt{padding:14px}.tc{display:none}.tc.active{display:block}
+.sc{background:var(--card);border-radius:var(--r);box-shadow:var(--sh);margin-bottom:10px;overflow:hidden}
+.sc-h{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;background:linear-gradient(135deg,#f0f4ff,#e8eeff);border-bottom:1px solid var(--brd)}
+.wn{font-weight:700;font-size:.95em;color:var(--pr-dk)}.wc{font-size:.75em;color:var(--txt2);background:rgba(26,115,232,.1);padding:2px 8px;border-radius:12px}
+.sc-b{padding:10px 14px}
+.sr{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid #f0f0f0}.sr:last-child{border:none}
+.sl{font-size:.82em;color:var(--txt2)}.sv{text-align:left}
+.sa{font-weight:700;font-size:1em}.sac{font-size:.72em;color:var(--txt2);margin-top:1px}
+.pos{color:var(--ok)}.neg{color:var(--no)}
+.rh{text-align:center;padding:10px;margin-top:6px;border-radius:8px;border:1px solid #d4edda;background:#f8fdf8}
+.rh.negative{background:#fdf8f8;border-color:#f5c6cb}
+.rb{font-size:1.5em;font-weight:800}.rcb{font-size:.85em;color:var(--txt2);margin-top:3px}
+.fc{background:var(--card);border-radius:var(--r);box-shadow:var(--sh);padding:18px;margin-bottom:14px}
+.ft{font-size:1.05em;font-weight:700;margin-bottom:14px;color:var(--pr-dk);display:flex;align-items:center;gap:6px}
+.fg{margin-bottom:12px}.fg label{display:block;font-size:.82em;font-weight:600;color:var(--txt2);margin-bottom:5px}
+.fg select,.fg input{width:100%;padding:9px 11px;border:2px solid var(--brd);border-radius:8px;font-size:1em;font-family:inherit;direction:rtl;transition:.2s}
+.fg select:focus,.fg input:focus{border-color:var(--pr);outline:none}
+.av{border-radius:10px;padding:12px;margin:10px 0;text-align:center;transition:.3s;background:linear-gradient(135deg,#e8f5e9,#f1f8e9);border:1px solid #c8e6c9}
+.av.warn{background:linear-gradient(135deg,#fff3e0,#fce4ec);border-color:#ffcc02}
+.av.danger{background:linear-gradient(135deg,#ffebee,#fce4ec);border-color:#ef9a9a}
+.av-l{font-size:.78em;color:var(--txt2);margin-bottom:3px}
+.av-a{font-size:1.4em;font-weight:800}.av-c{font-size:.82em;color:var(--txt2);margin-top:3px}
+.dp{margin-top:7px;padding-top:7px;border-top:1px dashed #ccc;font-size:.82em;color:var(--txt2)}
+.dp .aa{font-weight:700;font-size:1.05em}
+.btn{width:100%;padding:11px;border:none;border-radius:8px;font-size:1em;font-weight:700;font-family:inherit;cursor:pointer;transition:.2s}
+.btn-p{background:var(--pr);color:#fff}.btn-p:hover{background:var(--pr-dk)}.btn-p:disabled{background:#ccc;cursor:not-allowed}
+.ei{background:var(--card);border-radius:10px;box-shadow:var(--sh);padding:10px 14px;margin-bottom:7px;display:flex;justify-content:space-between;align-items:center}
+.er{display:flex;flex-direction:column;gap:1px}.ec{font-weight:700;font-size:.9em}.em{font-size:.72em;color:var(--txt2)}
+.el{text-align:left}.ea{font-weight:700;color:var(--no)}.eac{font-size:.72em;color:var(--txt2)}
+.dh{padding:7px 4px;font-weight:700;color:var(--txt2);font-size:.82em;margin-top:7px}
+.toast{position:fixed;bottom:85px;left:50%;transform:translateX(-50%);background:#333;color:#fff;padding:10px 22px;border-radius:8px;font-size:.87em;z-index:200;opacity:0;transition:.3s;pointer-events:none}
+.toast.show{opacity:1}.toast.success{background:var(--ok)}.toast.error{background:var(--no)}
+.ld{text-align:center;padding:36px;color:var(--txt2)}
+.sp{width:36px;height:36px;border:4px solid var(--brd);border-top-color:var(--pr);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 10px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.es{text-align:center;padding:36px 18px;color:var(--txt2)}.es .ic{font-size:2.8em;margin-bottom:10px}
+.tb{position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:2px solid var(--brd);padding:8px 14px;display:flex;justify-content:space-around;z-index:100;box-shadow:0 -2px 8px rgba(0,0,0,.1)}
+.ti{text-align:center}.tl{font-size:.68em;color:var(--txt2)}.tv{font-weight:800;font-size:.95em}
+</style>
+</head>
+<body>
+<div class="hdr"><h1>✈️ ميزانية السفر</h1><div class="sub">إدارة مصاريف رحلاتك</div></div>
+<div class="trip-sel"><select id="tripSel" onchange="onTrip()"><option value="">⏳ جاري التحميل...</option></select></div>
+<div class="tabs">
+  <div class="tab active" data-t="summary" onclick="sw('summary')"><span class="tab-ic">📊</span>الملخص</div>
+  <div class="tab" data-t="add-exp" onclick="sw('add-exp')"><span class="tab-ic">➕</span>مصروف</div>
+  <div class="tab" data-t="expenses" onclick="sw('expenses')"><span class="tab-ic">📋</span>المصاريف</div>
+  <div class="tab" data-t="add-inc" onclick="sw('add-inc')"><span class="tab-ic">💰</span>دخل</div>
+</div>
+<div class="cnt">
+  <div id="t-summary" class="tc active"><div id="sumBox"><div class="ld"><div class="sp"></div>جاري التحميل...</div></div></div>
+
+  <div id="t-add-exp" class="tc"><div class="fc">
+    <div class="ft">➕ مصروف جديد</div>
+    <div class="fg"><label>المحفظة</label><select id="xW" onchange="xWch()"><option value="">اختر المحفظة</option></select></div>
+    <div class="fg"><label>فئة المصروف</label><select id="xC"><option value="">اختر الفئة</option></select></div>
+    <div class="fg"><label>المبلغ</label><input type="number" id="xA" placeholder="أدخل المبلغ" oninput="xAin()"></div>
+    <div class="fg"><label>التاريخ</label><input type="date" id="xD"></div>
+    <div id="avBox" class="av" style="display:none">
+      <div class="av-l">💳 المبلغ المتاح في المحفظة</div>
+      <div class="av-a" id="avAmt">-</div>
+      <div class="av-c" id="avCnv">-</div>
+      <div class="dp" id="dpBox" style="display:none">
+        <div>⬇️ بعد الخصم:</div>
+        <div class="aa" id="dpAmt">-</div>
+        <div class="av-c" id="dpCnv">-</div>
+      </div>
+    </div>
+    <button class="btn btn-p" id="btnX" onclick="subX()" disabled>إضافة المصروف</button>
+  </div></div>
+
+  <div id="t-expenses" class="tc"><div id="expBox"><div class="ld"><div class="sp"></div>جاري التحميل...</div></div></div>
+
+  <div id="t-add-inc" class="tc"><div class="fc">
+    <div class="ft">💰 إضافة دخل</div>
+    <div class="fg"><label>المحفظة</label><select id="iW"><option value="">اختر المحفظة</option></select></div>
+    <div class="fg"><label>عملة المحفظة</label><select id="iCur"><option value="">اختر العملة</option></select></div>
+    <div class="fg"><label>المبلغ</label><input type="number" id="iA" placeholder="أدخل المبلغ"></div>
+    <button class="btn btn-p" id="btnI" onclick="subI()">إضافة الدخل</button>
+  </div></div>
+</div>
+
+<div class="tb" id="tBar" style="display:none">
+  <div class="ti"><div class="tl">إجمالي الدخل</div><div class="tv pos" id="tInc">-</div></div>
+  <div class="ti"><div class="tl">إجمالي المصاريف</div><div class="tv neg" id="tExp">-</div></div>
+  <div class="ti"><div class="tl">المتبقي</div><div class="tv" id="tRem">-</div></div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+// ╔═══════════════════════════════════════════════╗
+// ║  غيّر هذا إلى رابط الـ Web App الخاص بك      ║
+// ╚═══════════════════════════════════════════════╝
+const API = 'https://script.google.com/macros/s/AKfycbwxUvcoJGteFSWGz9jR9SGYbz-OLxZUq3d1m9Zu8se08Qm9_wFCoUvDitUzq4-QrtczQw/exec';
+
+let D=null, tripId="";
+
+// ══ تحميل البيانات ══
+async function load(){
+  try{
+    const r=await fetch(API+'?action=getAll');
+    D=await r.json();
+    fillTrips();fillWallets();fillCats();fillCurs();
+    if(D.trips?.length){
+      document.getElementById("tripSel").value=D.trips[0].id;
+      tripId=D.trips[0].id; render();
+    }
+  }catch(e){msg('خطأ: '+e.message,'error');}
+}
+
+// ══ تعبئة القوائم ══
+function fillTrips(){
+  const s=document.getElementById("tripSel");
+  s.innerHTML='<option value="">اختر الرحلة</option>';
+  (D.trips||[]).forEach(t=>{const o=document.createElement("option");o.value=t.id;o.textContent=t.name+" ("+t.flightNo+") — "+t.country;s.appendChild(o);});
+}
+function fillWallets(){
+  ["xW","iW"].forEach(id=>{
+    const s=document.getElementById(id);
+    s.innerHTML='<option value="">اختر المحفظة</option>';
+    (D.wallets||[]).forEach(w=>{const o=document.createElement("option");o.value=w.key;o.textContent=w.name+" ("+w.cardCurrency+")";o.dataset.cc=w.cardCurrency;s.appendChild(o);});
+  });
+}
+function fillCats(){
+  const s=document.getElementById("xC");
+  s.innerHTML='<option value="">اختر الفئة</option>';
+  (D.categories||[]).forEach(c=>{const o=document.createElement("option");o.value=c;o.textContent=c;s.appendChild(o);});
+}
+function fillCurs(){
+  const s=document.getElementById("iCur");
+  s.innerHTML='<option value="">اختر العملة</option>';
+  ['ريال سعودي','درهم مغربي','دولار أمريكي','درهم اماراتي'].forEach(c=>{const o=document.createElement('option');o.value=c;o.textContent=c;s.appendChild(o);});
+}
+
+// ══ التبويبات ══
+function sw(t){
+  document.querySelectorAll(".tab").forEach(e=>e.classList.remove("active"));
+  document.querySelectorAll(".tc").forEach(e=>e.classList.remove("active"));
+  document.querySelector("[data-t=\""+t+"\"]").classList.add("active");
+  document.getElementById("t-"+t).classList.add("active");
+}
+function onTrip(){tripId=document.getElementById("tripSel").value;if(tripId)render();}
+function render(){renderSum();renderExp();resetForm();}
+
+// ══ عرض الملخص ══
+function renderSum(){
+  const box=document.getElementById("sumBox");
+  const sm=(D.summary||[]).filter(s=>!tripId||s.tripId===tripId);
+  if(!sm.length){box.innerHTML='<div class="es"><div class="ic">📭</div><p>لا توجد بيانات</p></div>';document.getElementById("tBar").style.display="none";return;}
+  let h="",gi=0,ge=0;
+  sm.forEach(s=>{
+    const neg=s.remaining<0;gi+=s.totalIncome;ge+=s.totalExpenses;
+    h+='<div class="sc"><div class="sc-h"><span class="wn">🏦 '+s.walletName+'</span><span class="wc">'+s.currency+'</span></div>'+
+    '<div class="sc-b">'+
+    '<div class="sr"><span class="sl">💰 الدخل</span><div class="sv"><div class="sa pos">'+fn(s.totalIncome)+' '+cs(s.currency)+'</div><div class="sac">≈ '+fn(cv(s.totalIncome,s.currency))+' '+cs(opp(s.currency))+'</div></div></div>'+
+    '<div class="sr"><span class="sl">💸 المصاريف</span><div class="sv"><div class="sa neg">'+fn(s.totalExpenses)+' '+cs(s.currency)+'</div><div class="sac">≈ '+fn(cv(s.totalExpenses,s.currency))+' '+cs(opp(s.currency))+'</div></div></div>'+
+    '<div class="rh'+(neg?' negative':'')+'"><div class="av-l">المتبقي</div><div class="rb '+(neg?"neg":"pos")+'">'+fn(s.remaining)+' '+cs(s.currency)+'</div><div class="rcb">≈ '+fn(s.remainingConverted)+' '+cs(s.convertedCurrency)+'</div></div>'+
+    '</div></div>';
+  });
+  box.innerHTML=h;
+  const gr=gi-ge;
+  document.getElementById("tBar").style.display="flex";
+  document.getElementById("tInc").textContent=fn(gi);
+  document.getElementById("tExp").textContent=fn(ge);
+  const re=document.getElementById("tRem");re.textContent=fn(gr);re.className="tv "+(gr<0?"neg":"pos");
+}
+// ══ عرض المصاريف ══
+function renderExp(){
+  const box=document.getElementById("expBox");
+  const ex=(D.expenses||[]).filter(e=>!tripId||e.tripId===tripId);
+  if(!ex.length){box.innerHTML='<div class="es"><div class="ic">📝</div><p>لا توجد مصاريف</p></div>';return;}
+  ex.sort((a,b)=>(b.date||"").localeCompare(a.date||""));
+  let h="",cd="";
+  ex.forEach(e=>{
+    if(e.date!==cd){cd=e.date;h+='<div class="dh">📅 '+e.date+' — '+e.day+'</div>';}
+    const cnv=e.walletCurrency==="ريال سعودي"?"≈ "+fn(e.sarToMad)+" د.م":"≈ "+fn(e.madToSar)+" ر.س";
+    h+='<div class="ei"><div class="er"><div class="ec">'+e.category+'</div><div class="em">'+e.walletName+' · '+
+    (e.time||"")+'</div></div><div class="el"><div class="ea">-'+fn(e.amount)+' '+cs(e.walletCurrency)+
+    '</div><div class="eac">'+cnv+'</div></div></div>';
+  });
+  box.innerHTML=h;
+}
+
+// ══ المبلغ المتاح أثناء الإدخال ══
+function xWch(){
+  const wk=document.getElementById("xW").value;
+  const bx=document.getElementById("avBox");
+  if(!wk||!tripId){bx.style.display="none";return;}
+  bx.style.display="block";updAv();valForm();
+}
+function xAin(){updAv();valForm();}
+
+function updAv(){
+  const wk=document.getElementById("xW").value;
+  const amt=parseFloat(document.getElementById("xA").value)||0;
+  const bx=document.getElementById("avBox");
+  if(!wk||!tripId){bx.style.display="none";return;}
+  bx.style.display="block";
+  const w=(D.wallets||[]).find(x=>x.key===wk);if(!w)return;
+  const cur=w.cardCurrency;
+  const inc=(D.income||[]).filter(i=>i.tripId===tripId&&i.walletKey===wk&&i.walletCurrency===cur).reduce((s,i)=>s+(i.amount||0),0);
+  const exp=(D.expenses||[]).filter(e=>e.tripId===tripId&&e.walletKey===wk&&e.walletCurrency===cur).reduce((s,e)=>s+(e.amount||0),0);
+  const avail=inc-exp;
+  const after=avail-amt;
+  document.getElementById("avAmt").textContent=fn(avail)+" "+cs(cur);
+  document.getElementById("avAmt").className="av-a "+(avail>=0?"pos":"neg");
+  document.getElementById("avCnv").textContent="≈ "+fn(cv(avail,cur))+" "+cs(opp(cur));
+  const dp=document.getElementById("dpBox");
+  if(amt>0){
+    dp.style.display="block";
+    const da=document.getElementById("dpAmt");da.textContent=fn(after)+" "+cs(cur);da.className="aa "+(after>=0?"pos":"neg");
+    document.getElementById("dpCnv").textContent="≈ "+fn(cv(after,cur))+" "+cs(opp(cur));
+    bx.className="av"+(after<0?" danger":after<avail*.2?" warn":"");
+  }else{dp.style.display="none";bx.className="av";}
+}
+
+function valForm(){
+  const ok=document.getElementById("xW").value&&document.getElementById("xC").value&&document.getElementById("xA").value;
+  document.getElementById("btnX").disabled=!ok;
+}
+
+// ══ إرسال مصروف ══
+async function subX(){
+  const btn=document.getElementById("btnX");btn.disabled=true;btn.textContent="⏳ جاري...";
+  const wk=document.getElementById("xW").value;
+  const w=(D.wallets||[]).find(x=>x.key===wk);
+  try{
+    const r=await fetch(API,{method:"POST",body:JSON.stringify({
+      action:"addExpense",tripId,walletKey:wk,
+      category:document.getElementById("xC").value,
+      walletCurrency:w?w.cardCurrency:"ريال سعودي",
+      amount:parseFloat(document.getElementById("xA").value),
+      date:document.getElementById("xD").value||null
+    })});
+    const res=await r.json();
+    if(res.success){msg("✅ تمت إضافة المصروف","success");await load();document.getElementById("tripSel").value=tripId;render();}
+    else msg("❌ "+res.error,"error");
+  }catch(e){msg("❌ "+e.message,"error");}
+  btn.disabled=false;btn.textContent="إضافة المصروف";
+}
+
+// ══ إرسال دخل ══
+async function subI(){
+  const btn=document.getElementById("btnI");btn.disabled=true;btn.textContent="⏳ جاري...";
+  try{
+    const r=await fetch(API,{method:"POST",body:JSON.stringify({
+      action:"addIncome",tripId,
+      walletKey:document.getElementById("iW").value,
+      walletCurrency:document.getElementById("iCur").value,
+      amount:parseFloat(document.getElementById("iA").value)
+    })});
+    const res=await r.json();
+    if(res.success){msg("✅ تم إضافة الدخل","success");await load();document.getElementById("tripSel").value=tripId;render();}
+    else msg("❌ "+res.error,"error");
+  }catch(e){msg("❌ "+e.message,"error");}
+  btn.disabled=false;btn.textContent="إضافة الدخل";
+}
+
+// ══ دوال مساعدة ══
+function resetForm(){
+  document.getElementById("xW").value="";document.getElementById("xC").value="";
+  document.getElementById("xA").value="";document.getElementById("avBox").style.display="none";
+  document.getElementById("btnX").disabled=true;
+}
+function rate(cur){
+  if(!D?.currencies)return 1;
+  if(cur==="ريال سعودي"){const m=D.currencies.find(c=>c.currency==="MAD");return m?m.toOther:2.42;}
+  if(cur==="درهم مغربي"){const m=D.currencies.find(c=>c.currency==="MAD");return m?m.toSAR:0.41;}
+  return 1;
+}
+function cv(a,c){return Math.round(a*rate(c));}
+function opp(c){return c==="ريال سعودي"?"درهم مغربي":c==="درهم مغربي"?"ريال سعودي":c;}
+function cs(c){return{"ريال سعودي":"ر.س","درهم مغربي":"د.م","دولار أمريكي":"$","درهم اماراتي":"د.إ"}[c]||c;}
+function fn(n){return n==null?"0":Number(n).toLocaleString("ar-SA");}
+function msg(t,c=""){const e=document.getElementById("toast");e.textContent=t;e.className="toast show "+c;setTimeout(()=>e.className="toast",3000);}
+
+document.addEventListener("DOMContentLoaded",()=>{
+  document.getElementById("xD").valueAsDate=new Date();
+  ["xW","xC","xA"].forEach(id=>document.getElementById(id).addEventListener("change",valForm));
+  load();
+});
+</script>
+</body>
+</html>
