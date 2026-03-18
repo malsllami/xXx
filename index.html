@@ -904,6 +904,35 @@ body {
   to { opacity: 1; transform: translateX(-50%) translateY(0); }
 }
 
+/* ===== ATM SECTION ===== */
+.atm-section {
+  margin-top: 4px;
+  padding: 14px;
+  background: rgba(245,158,11,0.08);
+  border: 1px solid rgba(245,158,11,0.25);
+  border-radius: var(--radius-sm);
+}
+.atm-check {
+  font-size: 14px !important;
+  font-weight: 600;
+  color: var(--yellow) !important;
+  margin-bottom: 0 !important;
+}
+.atm-check input { accent-color: var(--yellow); }
+.atm-preview {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 14px;
+  background: rgba(34,197,94,0.08);
+  border: 1px solid rgba(34,197,94,0.2);
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+.atm-arrow { font-size: 16px; }
+
 /* ===== LIGHT THEME ===== */
 body.light {
   --bg: #f0f4f8;
@@ -1149,7 +1178,7 @@ body.light .loading-screen {
         <div class="form-row">
           <div class="form-group">
             <label>الفئة</label>
-            <select id="expCategory" class="form-control category-select" onchange="updateCategoryIcon()" required></select>
+            <select id="expCategory" class="form-control category-select" onchange="updateCategoryIcon();checkAtmVisibility();" required></select>
           </div>
           <div class="form-group">
             <label>الوصف</label>
@@ -1173,10 +1202,35 @@ body.light .loading-screen {
         </div>
         <div class="form-group">
           <label>المبلغ</label>
-          <input type="number" id="expAmount" class="form-control amount-input" placeholder="0.00" step="0.01" min="0">
+          <input type="number" id="expAmount" class="form-control amount-input" placeholder="0.00" step="0.01" min="0" oninput="onAmountChange()">
           <div id="walletBalanceHint" class="wallet-hint"></div>
         </div>
         <div id="conversionDisplay" class="conversion-box hidden"></div>
+        <!-- سحب صراف -->
+        <div id="atmSection" class="atm-section hidden">
+          <label class="checkbox-label atm-check">
+            <input type="checkbox" id="isAtmWithdrawal" onchange="onAtmToggle()">
+            <span>🏧 سحب من الصراف — الكاش يُضاف تلقائياً</span>
+          </label>
+          <div id="atmCashFields" class="hidden">
+            <div class="atm-preview" id="atmPreview"></div>
+            <div class="form-row" style="margin-top:10px">
+              <div class="form-group" style="margin-bottom:0">
+                <label>المبلغ الكاش (يمكن تعديله)</label>
+                <input type="number" id="atmCashAmount" class="form-control" placeholder="0.00" step="0.01" min="0" oninput="this.dataset.manual='1';syncAtmPreview()">
+              </div>
+              <div class="form-group" style="margin-bottom:0">
+                <label>عملة الكاش</label>
+                <select id="atmCashCurrency" class="form-control" onchange="document.getElementById('atmCashAmount').dataset.manual='';autoCalcCash()">
+                  <option value="SAR">ريال سعودي (SAR)</option>
+                  <option value="MAD">درهم مغربي (MAD)</option>
+                  <option value="USD">دولار (USD)</option>
+                  <option value="EUR">يورو (EUR)</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
       <div class="modal-footer">
         <button onclick="closeModal('expenseModal')" class="btn-secondary">إلغاء</button>
@@ -1927,6 +1981,14 @@ function openExpenseModal(expenseId) {
   // Set today's date
   document.getElementById('expDate').value = new Date().toISOString().split('T')[0];
 
+  // Reset ATM fields
+  document.getElementById('isAtmWithdrawal').checked = false;
+  document.getElementById('atmCashFields').classList.add('hidden');
+  const atmCashEl = document.getElementById('atmCashAmount');
+  atmCashEl.value = '';
+  delete atmCashEl.dataset.manual;
+  document.getElementById('atmSection').classList.add('hidden');
+
   if (expenseId) {
     title.textContent = 'تعديل المصروف';
     const exp = state.expenses.find(e => e.id === expenseId);
@@ -1956,6 +2018,78 @@ function editExpense(id) { openExpenseModal(id); }
 function onCurrencyChange() {
   updateConversionDisplay();
   onWalletChange();
+  // Recalc ATM cash when expense currency/amount changes
+  if (document.getElementById('isAtmWithdrawal')?.checked) {
+    autoCalcCash();
+  }
+}
+
+// ===== ATM Helpers =====
+function checkAtmVisibility() {
+  const catName = document.getElementById('expCategory').value;
+  const walletName = document.getElementById('expWallet').value;
+  const wallet = state.wallets.find(w => w.name === walletName);
+  const isSarWallet = wallet && !wallet.isMultiCurrency && wallet.currency === 'SAR';
+  const isCashCategory = catName === 'سحب نقدي';
+  const show = isSarWallet && isCashCategory;
+  document.getElementById('atmSection').classList.toggle('hidden', !show);
+  if (!show) {
+    document.getElementById('isAtmWithdrawal').checked = false;
+    document.getElementById('atmCashFields').classList.add('hidden');
+  }
+}
+
+
+function onAtmToggle() {
+  const checked = document.getElementById('isAtmWithdrawal').checked;
+  document.getElementById('atmCashFields').classList.toggle('hidden', !checked);
+  if (checked) {
+    // Expense is always SAR — cash is the foreign currency received
+    // Default cash currency = MAD (most common ATM scenario)
+    const cashCurSel = document.getElementById('atmCashCurrency');
+    if (cashCurSel.value === 'SAR') cashCurSel.value = 'MAD';
+    const cashInput = document.getElementById('atmCashAmount');
+    delete cashInput.dataset.manual;
+    autoCalcCash();
+  }
+}
+
+function autoCalcCash() {
+  // Auto-calculate cash from SAR amount using exchange rate
+  const sarAmount = parseFloat(document.getElementById('expAmount').value) || 0;
+  const cashCur = document.getElementById('atmCashCurrency').value;
+  const cashInput = document.getElementById('atmCashAmount');
+  if (!cashInput.dataset.manual && sarAmount > 0 && cashCur !== 'SAR') {
+    const cashAmt = convert(sarAmount, 'SAR', cashCur);
+    cashInput.value = cashAmt.toFixed(2);
+  }
+  syncAtmPreview();
+}
+
+function syncAtmPreview() {
+  const sarAmount = parseFloat(document.getElementById('expAmount').value) || 0;
+  const cashCur = document.getElementById('atmCashCurrency').value;
+  const cashInput = document.getElementById('atmCashAmount');
+  const preview = document.getElementById('atmPreview');
+  const cashAmt = parseFloat(cashInput.value) || 0;
+  if (sarAmount > 0 || cashAmt > 0) {
+    preview.innerHTML =
+      `<span class="atm-arrow">🏦</span> خصم <strong>${fmt(sarAmount,'SAR')}</strong> &nbsp;→&nbsp; كاش <strong style="color:var(--green)">${fmt(cashAmt, cashCur)}</strong>`;
+  } else {
+    preview.innerHTML = '';
+  }
+}
+
+function calcAtmAuto() { autoCalcCash(); }
+
+function onAmountChange() {
+  updateConversionDisplay();
+  checkAtmVisibility();
+  if (document.getElementById('isAtmWithdrawal')?.checked) {
+    const cashInput = document.getElementById('atmCashAmount');
+    // Only auto-update if user hasn't manually set a different amount
+    autoCalcCash();
+  }
 }
 
 function onWalletChange() {
@@ -1976,6 +2110,7 @@ function onWalletChange() {
     hint.textContent = `💰 الرصيد المتاح: ${fmt(dispBalance, currency)} (${fmt(balance, wallet.currency)})`;
   }
   hint.classList.remove('hidden');
+  checkAtmVisibility();
 }
 
 function updateCategoryIcon() {} // for potential use
@@ -2003,13 +2138,16 @@ async function saveExpense() {
   const currency = document.getElementById('expCurrency').value;
   const wallet = document.getElementById('expWallet').value;
   const amount = parseFloat(document.getElementById('expAmount').value);
+  const isAtm = document.getElementById('isAtmWithdrawal')?.checked && !document.getElementById('atmCashFields').classList.contains('hidden');
+  const atmCashAmount = parseFloat(document.getElementById('atmCashAmount')?.value) || 0;
+  const atmCashCurrency = document.getElementById('atmCashCurrency')?.value || 'MAD';
 
   if (!tripId || !catName || !wallet || !amount || amount <= 0) {
     showToast('يرجى ملء جميع الحقول المطلوبة', 'error'); return;
   }
-
-  const madToSar = convert(amount, currency, 'SAR') !== amount ? convert(1, 'MAD', 'SAR') : 0;
-  const sarToMad = convert(1, 'SAR', 'MAD');
+  if (isAtm && (!atmCashAmount || atmCashAmount <= 0)) {
+    showToast('أدخل مبلغ الكاش المستلم', 'error'); return;
+  }
 
   const data = {
     tripId, date, category: catName, categoryIcon: category?.icon || '📦',
@@ -2024,10 +2162,20 @@ async function saveExpense() {
       showToast('تم التعديل ✅', 'success');
     } else {
       await api('POST', { action: 'اضافة مصروف', data });
-      showToast('تمت الإضافة ✅', 'success');
+      // ===== سحب صراف: إضافة تلقائية للكاش =====
+      if (isAtm && atmCashAmount > 0) {
+        const cashWallet = state.wallets.find(w => w.name === 'كاش');
+        if (cashWallet) {
+          await api('POST', { action: 'ايداع محفظة', data: { walletId: cashWallet.id, amount: atmCashAmount, currency: atmCashCurrency } });
+          showToast(`✅ تمت الإضافة + إيداع ${fmt(atmCashAmount, atmCashCurrency)} في الكاش`, 'success');
+        } else {
+          showToast('تمت الإضافة ✅ (تعذّر إيجاد محفظة الكاش)', 'success');
+        }
+      } else {
+        showToast('تمت الإضافة ✅', 'success');
+      }
     }
     closeModal('expenseModal');
-    // Reload
     state.expenses = await api('GET', { action: 'مصاريف', 'رحلة': state.activeTrip });
     state.wallets = await api('GET', { action: 'محافظ' });
     renderAll();
