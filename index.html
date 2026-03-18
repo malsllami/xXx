@@ -904,6 +904,44 @@ body {
   to { opacity: 1; transform: translateX(-50%) translateY(0); }
 }
 
+/* ===== LIGHT THEME ===== */
+body.light {
+  --bg: #f0f4f8;
+  --bg2: #ffffff;
+  --bg3: #f8fafc;
+  --bg4: #edf2f7;
+  --border: #e2e8f0;
+  --text: #1a202c;
+  --text2: #4a5568;
+  --text3: #718096;
+  --shadow: 0 4px 24px rgba(0,0,0,0.08);
+}
+body.light .topbar {
+  background: rgba(240,244,248,0.95);
+}
+body.light .sidebar {
+  background: #ffffff;
+}
+body.light .loading-screen {
+  background: #f0f4f8;
+  color: #1a202c;
+}
+
+.theme-toggle {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--bg3);
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+.theme-toggle:hover { background: var(--bg4); transform: scale(1.05); }
+
 /* ===== RESPONSIVE ===== */
 @media (max-width: 768px) {
   .sidebar {
@@ -1011,6 +1049,7 @@ body {
         <button class="menu-btn" onclick="toggleSidebar()">☰</button>
         <h2 class="page-title" id="pageTitle">لوحة التحكم</h2>
         <div class="topbar-actions">
+          <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="تبديل المظهر">🌙</button>
           <button class="btn-add-expense" onclick="openExpenseModal()">+ مصروف</button>
         </div>
       </header>
@@ -1321,6 +1360,7 @@ let state = {
 
 // ===== INIT =====
 async function init() {
+  loadTheme();
   SCRIPT_URL = localStorage.getItem('scriptUrl') || '';
   if (!SCRIPT_URL) {
     showSetup();
@@ -1370,7 +1410,7 @@ async function saveScriptUrl() {
   SCRIPT_URL = url;
   showLoading();
   try {
-    await api('GET', { action: 'initSheets' });
+    await api('GET', { action: 'تهيئة' });
     await loadAllData();
     showApp();
     renderAll();
@@ -1386,40 +1426,57 @@ function changeScript() {
   showSetup();
 }
 
-// ===== API =====
-// كل الطلبات عبر GET لتجنب مشكلة CORS مع Google Apps Script
-async function api(method, params) {
-  let qs;
-  if (method === 'GET') {
-    qs = Object.entries(params).map(([k,v]) => `${encodeURIComponent(k)}=${encodeURIComponent(v)}`).join('&');
-  } else {
-    // حول POST إلى GET
-    const action = params.action;
-    qs = `action=${encodeURIComponent(action)}`;
-    // إذا فيه id مباشر (مثل deleteTrip, deleteExpense)
-    if (params.id !== undefined) {
-      qs += `&id=${encodeURIComponent(params.id)}`;
+// ===== API - JSONP to bypass CORS =====
+let _cbCounter = 0;
+function api(method, params) {
+  return new Promise((resolve, reject) => {
+    let qs;
+    if (method === 'GET') {
+      qs = Object.entries(params)
+        .map(([k,v]) => encodeURIComponent(k)+'='+encodeURIComponent(v))
+        .join('&');
+    } else {
+      const action = params.action;
+      qs = 'action=' + encodeURIComponent(action);
+      if (params.id !== undefined) qs += '&id=' + encodeURIComponent(params.id);
+      if (params.data !== undefined) qs += '&payload=' + encodeURIComponent(JSON.stringify(params.data));
     }
-    // إذا فيه data (مثل addTrip, updateWallet)
-    if (params.data !== undefined) {
-      qs += `&payload=${encodeURIComponent(JSON.stringify(params.data))}`;
+    const cbName = '__cb' + (++_cbCounter) + '_' + Date.now();
+    qs += '&callback=' + cbName;
+    const url = SCRIPT_URL + '?' + qs;
+
+    const timeout = setTimeout(() => {
+      cleanup();
+      reject(new Error('انتهت مهلة الطلب'));
+    }, 30000);
+
+    function cleanup() {
+      clearTimeout(timeout);
+      delete window[cbName];
+      const el = document.getElementById(cbName);
+      if (el) el.remove();
     }
-  }
-  const url = `${SCRIPT_URL}?${qs}`;
-  const res = await fetch(url);
-  const text = await res.text();
-  let data;
-  try { data = JSON.parse(text); } catch(e) { throw new Error('Response not JSON: ' + text.substring(0,200)); }
-  if (data.error) throw new Error(data.error);
-  return data;
+
+    window[cbName] = function(data) {
+      cleanup();
+      if (data && data.error) reject(new Error(data.error));
+      else resolve(data);
+    };
+
+    const script = document.createElement('script');
+    script.id = cbName;
+    script.src = url;
+    script.onerror = () => { cleanup(); reject(new Error('فشل الاتصال بالسيرفر')); };
+    document.head.appendChild(script);
+  });
 }
 
 async function loadAllData() {
   const [wallets, trips, categories, settings] = await Promise.all([
-    api('GET', { action: 'getWallets' }),
-    api('GET', { action: 'getTrips' }),
-    api('GET', { action: 'getCategories' }),
-    api('GET', { action: 'getSettings' }),
+    api('GET', { action: 'محافظ' }),
+    api('GET', { action: 'رحلات' }),
+    api('GET', { action: 'فئات' }),
+    api('GET', { action: 'اعدادات' }),
   ]);
   state.wallets = wallets;
   state.trips = trips;
@@ -1428,7 +1485,7 @@ async function loadAllData() {
 
   // Load expenses for active trip
   if (state.activeTrip) {
-    state.expenses = await api('GET', { action: 'getExpenses', tripId: state.activeTrip });
+    state.expenses = await api('GET', { action: 'مصاريف', 'رحلة': state.activeTrip });
   }
 }
 
@@ -1493,7 +1550,7 @@ async function setActiveTrip(id) {
   if (id) {
     showLoading();
     try {
-      state.expenses = await api('GET', { action: 'getExpenses', tripId: id });
+      state.expenses = await api('GET', { action: 'مصاريف', 'رحلة': id });
     } catch(e) { state.expenses = []; }
     showApp();
   } else {
@@ -1837,7 +1894,7 @@ async function saveSettings() {
     if (el) data[k] = el.value;
   });
   try {
-    await api('POST', { action: 'updateSettings', data });
+    await api('POST', { action: 'حفظ اعدادات', data });
     state.settings = { ...state.settings, ...data };
     showToast('تم حفظ الإعدادات ✅', 'success');
     renderAll();
@@ -1963,16 +2020,16 @@ async function saveExpense() {
 
   try {
     if (state.editingExpense) {
-      await api('POST', { action: 'updateExpense', data: { ...data, id: state.editingExpense, createdAt: state.expenses.find(e=>e.id===state.editingExpense)?.createdAt } });
+      await api('POST', { action: 'تعديل مصروف', data: { ...data, id: state.editingExpense, createdAt: state.expenses.find(e=>e.id===state.editingExpense)?.createdAt } });
       showToast('تم التعديل ✅', 'success');
     } else {
-      await api('POST', { action: 'addExpense', data });
+      await api('POST', { action: 'اضافة مصروف', data });
       showToast('تمت الإضافة ✅', 'success');
     }
     closeModal('expenseModal');
     // Reload
-    state.expenses = await api('GET', { action: 'getExpenses', tripId: state.activeTrip });
-    state.wallets = await api('GET', { action: 'getWallets' });
+    state.expenses = await api('GET', { action: 'مصاريف', 'رحلة': state.activeTrip });
+    state.wallets = await api('GET', { action: 'محافظ' });
     renderAll();
   } catch(e) {
     showToast('فشل الحفظ: ' + e.message, 'error');
@@ -1982,7 +2039,7 @@ async function saveExpense() {
 async function deleteExpense(id) {
   if (!confirm('حذف هذا المصروف؟')) return;
   try {
-    await api('POST', { action: 'deleteExpense', id });
+    await api('POST', { action: 'حذف مصروف', id });
     state.expenses = state.expenses.filter(e => e.id !== id);
     renderAll();
     showToast('تم الحذف', 'success');
@@ -2037,11 +2094,11 @@ async function saveWallet() {
   try {
     if (state.editingWallet) {
       const existing = state.wallets.find(w => w.id === state.editingWallet);
-      await api('POST', { action: 'updateWallet', data: { ...existing, ...data, id: state.editingWallet } });
+      await api('POST', { action: 'تعديل محفظة', data: { ...existing, ...data, id: state.editingWallet } });
     } else {
-      await api('POST', { action: 'addWallet', data });
+      await api('POST', { action: 'اضافة محفظة', data });
     }
-    state.wallets = await api('GET', { action: 'getWallets' });
+    state.wallets = await api('GET', { action: 'محافظ' });
     closeModal('walletModal');
     renderAll();
     showToast('تم الحفظ ✅', 'success');
@@ -2053,7 +2110,7 @@ async function saveWallet() {
 async function deleteWallet(id) {
   if (!confirm('حذف هذه المحفظة؟')) return;
   try {
-    await api('POST', { action: 'deleteWallet', id });
+    await api('POST', { action: 'حذف محفظة', id });
     state.wallets = state.wallets.filter(w => w.id !== id);
     renderAll();
     showToast('تم الحذف', 'success');
@@ -2096,8 +2153,8 @@ async function saveWalletIncome() {
   if (!amount || amount <= 0) { showToast('أدخل مبلغاً صحيحاً', 'error'); return; }
 
   try {
-    await api('POST', { action: 'addWalletIncome', data: { walletId, amount, currency } });
-    state.wallets = await api('GET', { action: 'getWallets' });
+    await api('POST', { action: 'ايداع محفظة', data: { walletId, amount, currency } });
+    state.wallets = await api('GET', { action: 'محافظ' });
     closeModal('walletIncomeModal');
     renderAll();
     showToast('تم الإيداع ✅', 'success');
@@ -2175,12 +2232,12 @@ async function saveTrip() {
   try {
     if (state.editingTrip) {
       const existing = state.trips.find(t => t.id === state.editingTrip);
-      await api('POST', { action: 'updateTrip', data: { ...existing, ...data, id: state.editingTrip } });
+      await api('POST', { action: 'تعديل رحلة', data: { ...existing, ...data, id: state.editingTrip } });
     } else {
-      const result = await api('POST', { action: 'addTrip', data });
+      const result = await api('POST', { action: 'اضافة رحلة', data });
       if (!state.activeTrip) state.activeTrip = result.id;
     }
-    state.trips = await api('GET', { action: 'getTrips' });
+    state.trips = await api('GET', { action: 'رحلات' });
     closeModal('tripModal');
     renderAll();
     showToast('تم الحفظ ✅', 'success');
@@ -2192,7 +2249,7 @@ async function saveTrip() {
 async function deleteTrip(id) {
   if (!confirm('حذف هذه الرحلة؟')) return;
   try {
-    await api('POST', { action: 'deleteTrip', id });
+    await api('POST', { action: 'حذف رحلة', id });
     state.trips = state.trips.filter(t => t.id !== id);
     if (state.activeTrip === id) { state.activeTrip = state.trips[0]?.id || null; }
     renderAll();
@@ -2233,11 +2290,11 @@ async function saveCategory() {
   const data = { name, icon, color };
   try {
     if (state.editingCategory) {
-      await api('POST', { action: 'updateCategory', data: { ...data, id: state.editingCategory } });
+      await api('POST', { action: 'تعديل فئة', data: { ...data, id: state.editingCategory } });
     } else {
-      await api('POST', { action: 'addCategory', data });
+      await api('POST', { action: 'اضافة فئة', data });
     }
-    state.categories = await api('GET', { action: 'getCategories' });
+    state.categories = await api('GET', { action: 'فئات' });
     closeModal('categoryModal');
     renderAll();
     showToast('تم الحفظ ✅', 'success');
@@ -2249,7 +2306,7 @@ async function saveCategory() {
 async function deleteCategory(id) {
   if (!confirm('حذف هذه الفئة؟')) return;
   try {
-    await api('POST', { action: 'deleteCategory', id });
+    await api('POST', { action: 'حذف فئة', id });
     state.categories = state.categories.filter(c => c.id !== id);
     renderAll();
     showToast('تم الحذف', 'success');
@@ -2308,6 +2365,22 @@ function showToast(msg, type) {
 }
 
 // Listen for trip/budget date changes
+// ===== THEME =====
+function toggleTheme() {
+  const isLight = document.body.classList.toggle('light');
+  localStorage.setItem('theme', isLight ? 'light' : 'dark');
+  document.getElementById('themeToggle').textContent = isLight ? '☀️' : '🌙';
+}
+
+function loadTheme() {
+  const saved = localStorage.getItem('theme');
+  if (saved === 'light') {
+    document.body.classList.add('light');
+    const btn = document.getElementById('themeToggle');
+    if (btn) btn.textContent = '☀️';
+  }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('tripStart')?.addEventListener('change', updateTripDuration);
   document.getElementById('tripEnd')?.addEventListener('change', updateTripDuration);
