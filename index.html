@@ -1,302 +1,2312 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ميزانية السفر</title>
-<style>
-:root{--pr:#1a73e8;--pr-dk:#1557b0;--ok:#34a853;--no:#ea4335;--warn:#fbbc04;--bg:#f8f9fa;--card:#fff;--txt:#202124;--txt2:#5f6368;--brd:#dadce0;--sh:0 1px 3px rgba(0,0,0,.12);--sh2:0 4px 12px rgba(0,0,0,.15);--r:12px}
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:"Segoe UI","Cairo",sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;padding-bottom:80px}
-.hdr{background:linear-gradient(135deg,var(--pr),var(--pr-dk));color:#fff;padding:18px;text-align:center;position:sticky;top:0;z-index:100;box-shadow:var(--sh2)}
-.hdr h1{font-size:1.3em;margin-bottom:2px}.hdr .sub{font-size:.82em;opacity:.9}
-.trip-sel{padding:10px 14px;background:var(--card);border-bottom:1px solid var(--brd)}
-.trip-sel select{width:100%;padding:10px;border:2px solid var(--brd);border-radius:8px;font-size:1em;font-family:inherit;direction:rtl}
-.trip-sel select:focus{border-color:var(--pr);outline:none}
-.tabs{display:flex;background:var(--card);border-bottom:2px solid var(--brd);position:sticky;top:58px;z-index:99}
-.tab{flex:1;padding:10px 6px;text-align:center;cursor:pointer;font-size:.8em;font-weight:600;color:var(--txt2);border-bottom:3px solid transparent;transition:.2s}
-.tab.active{color:var(--pr);border-bottom-color:var(--pr);background:rgba(26,115,232,.05)}
-.tab-ic{font-size:1.2em;display:block;margin-bottom:1px}
-.cnt{padding:14px}.tc{display:none}.tc.active{display:block}
-.sc{background:var(--card);border-radius:var(--r);box-shadow:var(--sh);margin-bottom:10px;overflow:hidden}
-.sc-h{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;background:linear-gradient(135deg,#f0f4ff,#e8eeff);border-bottom:1px solid var(--brd)}
-.wn{font-weight:700;font-size:.95em;color:var(--pr-dk)}.wc{font-size:.75em;color:var(--txt2);background:rgba(26,115,232,.1);padding:2px 8px;border-radius:12px}
-.sc-b{padding:10px 14px}
-.sr{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid #f0f0f0}.sr:last-child{border:none}
-.sl{font-size:.82em;color:var(--txt2)}.sv{text-align:left}
-.sa{font-weight:700;font-size:1em}.sac{font-size:.72em;color:var(--txt2);margin-top:1px}
-.pos{color:var(--ok)}.neg{color:var(--no)}
-.rh{text-align:center;padding:10px;margin-top:6px;border-radius:8px;border:1px solid #d4edda;background:#f8fdf8}
-.rh.negative{background:#fdf8f8;border-color:#f5c6cb}
-.rb{font-size:1.5em;font-weight:800}.rcb{font-size:.85em;color:var(--txt2);margin-top:3px}
-.fc{background:var(--card);border-radius:var(--r);box-shadow:var(--sh);padding:18px;margin-bottom:14px}
-.ft{font-size:1.05em;font-weight:700;margin-bottom:14px;color:var(--pr-dk);display:flex;align-items:center;gap:6px}
-.fg{margin-bottom:12px}.fg label{display:block;font-size:.82em;font-weight:600;color:var(--txt2);margin-bottom:5px}
-.fg select,.fg input{width:100%;padding:9px 11px;border:2px solid var(--brd);border-radius:8px;font-size:1em;font-family:inherit;direction:rtl;transition:.2s}
-.fg select:focus,.fg input:focus{border-color:var(--pr);outline:none}
-.av{border-radius:10px;padding:12px;margin:10px 0;text-align:center;transition:.3s;background:linear-gradient(135deg,#e8f5e9,#f1f8e9);border:1px solid #c8e6c9}
-.av.warn{background:linear-gradient(135deg,#fff3e0,#fce4ec);border-color:#ffcc02}
-.av.danger{background:linear-gradient(135deg,#ffebee,#fce4ec);border-color:#ef9a9a}
-.av-l{font-size:.78em;color:var(--txt2);margin-bottom:3px}
-.av-a{font-size:1.4em;font-weight:800}.av-c{font-size:.82em;color:var(--txt2);margin-top:3px}
-.dp{margin-top:7px;padding-top:7px;border-top:1px dashed #ccc;font-size:.82em;color:var(--txt2)}
-.dp .aa{font-weight:700;font-size:1.05em}
-.btn{width:100%;padding:11px;border:none;border-radius:8px;font-size:1em;font-weight:700;font-family:inherit;cursor:pointer;transition:.2s}
-.btn-p{background:var(--pr);color:#fff}.btn-p:hover{background:var(--pr-dk)}.btn-p:disabled{background:#ccc;cursor:not-allowed}
-.ei{background:var(--card);border-radius:10px;box-shadow:var(--sh);padding:10px 14px;margin-bottom:7px;display:flex;justify-content:space-between;align-items:center}
-.er{display:flex;flex-direction:column;gap:1px}.ec{font-weight:700;font-size:.9em}.em{font-size:.72em;color:var(--txt2)}
-.el{text-align:left}.ea{font-weight:700;color:var(--no)}.eac{font-size:.72em;color:var(--txt2)}
-.dh{padding:7px 4px;font-weight:700;color:var(--txt2);font-size:.82em;margin-top:7px}
-.toast{position:fixed;bottom:85px;left:50%;transform:translateX(-50%);background:#333;color:#fff;padding:10px 22px;border-radius:8px;font-size:.87em;z-index:200;opacity:0;transition:.3s;pointer-events:none}
-.toast.show{opacity:1}.toast.success{background:var(--ok)}.toast.error{background:var(--no)}
-.ld{text-align:center;padding:36px;color:var(--txt2)}
-.sp{width:36px;height:36px;border:4px solid var(--brd);border-top-color:var(--pr);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 10px}
-@keyframes spin{to{transform:rotate(360deg)}}
-.es{text-align:center;padding:36px 18px;color:var(--txt2)}.es .ic{font-size:2.8em;margin-bottom:10px}
-.tb{position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:2px solid var(--brd);padding:8px 14px;display:flex;justify-content:space-around;z-index:100;box-shadow:0 -2px 8px rgba(0,0,0,.1)}
-.ti{text-align:center}.tl{font-size:.68em;color:var(--txt2)}.tv{font-weight:800;font-size:.95em}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ميزانية السفر</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+/* =============================================
+   Travel Budget Manager - Styles
+   ============================================= */
+
+:root {
+  --bg: #0f1117;
+  --bg2: #161b27;
+  --bg3: #1e2536;
+  --bg4: #252d3d;
+  --border: #2e3a52;
+  --text: #e2e8f0;
+  --text2: #94a3b8;
+  --text3: #64748b;
+  --accent: #3b82f6;
+  --accent2: #1d4ed8;
+  --green: #22c55e;
+  --red: #ef4444;
+  --yellow: #f59e0b;
+  --purple: #8b5cf6;
+  --radius: 12px;
+  --radius-sm: 8px;
+  --shadow: 0 4px 24px rgba(0,0,0,0.4);
+  --sidebar-w: 260px;
+  --font: 'IBM Plex Sans Arabic', sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  direction: rtl;
+}
+
+.hidden { display: none !important; }
+
+/* ===== SETUP SCREEN ===== */
+.setup-screen {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #0f1117 0%, #1a1f35 100%);
+  padding: 20px;
+}
+
+.setup-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 40px;
+  max-width: 560px;
+  width: 100%;
+  text-align: center;
+  box-shadow: var(--shadow);
+}
+
+.setup-icon { font-size: 56px; margin-bottom: 16px; }
+.setup-card h1 { font-size: 28px; font-weight: 700; margin-bottom: 8px; }
+.setup-card > p { color: var(--text2); margin-bottom: 24px; }
+
+.setup-form { display: flex; flex-direction: column; gap: 12px; margin-bottom: 28px; }
+.setup-input {
+  padding: 12px 16px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-size: 14px;
+  font-family: var(--font);
+  direction: ltr;
+  text-align: left;
+}
+.setup-input:focus { outline: none; border-color: var(--accent); }
+
+.setup-help {
+  background: var(--bg3);
+  border-radius: var(--radius-sm);
+  padding: 20px;
+  text-align: right;
+}
+.setup-help p { font-weight: 600; margin-bottom: 12px; }
+.setup-help ol { padding-right: 20px; line-height: 2; font-size: 13px; color: var(--text2); }
+.setup-help code {
+  background: var(--bg4);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 12px;
+  direction: ltr;
+  display: inline-block;
+}
+
+/* ===== LOADING ===== */
+.loading-screen {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+}
+
+.loading-spinner {
+  width: 48px;
+  height: 48px;
+  border: 3px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ===== LAYOUT ===== */
+#app {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* ===== SIDEBAR ===== */
+.sidebar {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: var(--sidebar-w);
+  height: 100vh;
+  background: var(--bg2);
+  border-left: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  z-index: 100;
+  transition: transform 0.3s ease;
+}
+
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 99;
+}
+
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 20px 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.app-logo { font-size: 28px; }
+.app-title { flex: 1; }
+.title-main { display: block; font-size: 18px; font-weight: 700; color: var(--text); }
+.title-sub { display: block; font-size: 12px; color: var(--text2); }
+.sidebar-close { display: none; background: none; border: none; color: var(--text2); font-size: 18px; cursor: pointer; }
+
+.sidebar-trip-selector {
+  padding: 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.sidebar-trip-selector label {
+  display: block;
+  font-size: 11px;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+
+.trip-select {
+  width: 100%;
+  padding: 8px 12px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.nav-menu {
+  list-style: none;
+  padding: 12px 8px;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  color: var(--text2);
+  text-decoration: none;
+  font-size: 14px;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.nav-item:hover { background: var(--bg3); color: var(--text); }
+.nav-item.active { background: rgba(59,130,246,0.15); color: var(--accent); }
+.nav-icon { font-size: 18px; min-width: 24px; text-align: center; }
+
+.sidebar-footer {
+  padding: 16px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.btn-sync {
+  padding: 8px 16px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text2);
+  font-family: var(--font);
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-sync:hover { background: var(--bg4); color: var(--text); }
+
+.btn-link {
+  background: none;
+  border: none;
+  color: var(--text3);
+  font-size: 12px;
+  cursor: pointer;
+  font-family: var(--font);
+  text-align: center;
+}
+.btn-link:hover { color: var(--text2); }
+
+/* ===== MAIN CONTENT ===== */
+.main-content {
+  flex: 1;
+  margin-right: var(--sidebar-w);
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.topbar {
+  position: sticky;
+  top: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 20px;
+  height: 60px;
+  background: rgba(15,17,23,0.9);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  z-index: 50;
+}
+
+.menu-btn {
+  display: none;
+  background: none;
+  border: none;
+  color: var(--text);
+  font-size: 22px;
+  cursor: pointer;
+}
+
+.page-title {
+  flex: 1;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.btn-add-expense {
+  padding: 7px 16px;
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: var(--font);
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.btn-add-expense:hover { background: var(--accent2); }
+
+.page-content { padding: 24px; flex: 1; }
+
+/* ===== PAGES ===== */
+.page { display: none; }
+.page.active { display: block; }
+
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.page-header h3 { font-size: 18px; font-weight: 600; }
+.page-header-actions { display: flex; gap: 10px; align-items: center; }
+
+/* ===== DASHBOARD ===== */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.stat-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 4px;
+  height: 100%;
+}
+.stat-card.blue::before { background: var(--accent); }
+.stat-card.green::before { background: var(--green); }
+.stat-card.red::before { background: var(--red); }
+.stat-card.yellow::before { background: var(--yellow); }
+.stat-card.purple::before { background: var(--purple); }
+
+.stat-icon { font-size: 24px; margin-bottom: 8px; }
+.stat-label { font-size: 12px; color: var(--text2); margin-bottom: 4px; }
+.stat-value { font-size: 22px; font-weight: 700; }
+.stat-sub { font-size: 12px; color: var(--text3); margin-top: 4px; }
+
+.section-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+.wallets-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.wallet-mini {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.wallet-mini:hover { border-color: var(--accent); transform: translateY(-2px); }
+.wallet-mini-name { font-size: 13px; color: var(--text2); margin-bottom: 6px; }
+.wallet-mini-balance { font-size: 18px; font-weight: 700; }
+.wallet-mini-currency { font-size: 11px; color: var(--text3); margin-top: 4px; }
+
+.category-chart {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.cat-bar-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.cat-bar-label { min-width: 140px; font-size: 13px; display: flex; align-items: center; gap: 6px; }
+.cat-bar-track { flex: 1; background: var(--bg3); border-radius: 4px; height: 8px; overflow: hidden; }
+.cat-bar-fill { height: 100%; border-radius: 4px; background: var(--accent); transition: width 0.8s ease; }
+.cat-bar-amount { min-width: 80px; text-align: left; font-size: 13px; color: var(--text2); direction: ltr; }
+
+.trip-progress {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-bottom: 24px;
+}
+
+.progress-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+.progress-track {
+  background: var(--bg3);
+  border-radius: 8px;
+  height: 12px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+.progress-fill {
+  height: 100%;
+  border-radius: 8px;
+  background: linear-gradient(90deg, var(--green), var(--accent));
+  transition: width 0.8s ease;
+}
+.progress-fill.over { background: linear-gradient(90deg, var(--yellow), var(--red)); }
+.progress-labels { display: flex; justify-content: space-between; font-size: 12px; color: var(--text3); }
+
+/* ===== EXPENSES LIST ===== */
+.expenses-list { display: flex; flex-direction: column; gap: 8px; }
+
+.expense-item {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: border-color 0.2s;
+}
+.expense-item:hover { border-color: var(--accent); }
+
+.expense-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  background: var(--bg3);
+  flex-shrink: 0;
+}
+
+.expense-info { flex: 1; min-width: 0; }
+.expense-cat { font-size: 14px; font-weight: 600; }
+.expense-desc { font-size: 12px; color: var(--text2); margin-top: 2px; }
+.expense-meta { font-size: 11px; color: var(--text3); margin-top: 4px; }
+
+.expense-amounts { text-align: left; }
+.expense-main-amount { font-size: 16px; font-weight: 700; direction: ltr; }
+.expense-conv-amount { font-size: 11px; color: var(--text3); direction: ltr; margin-top: 2px; }
+
+.expense-actions { display: flex; gap: 6px; }
+.btn-icon {
+  width: 30px;
+  height: 30px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--bg3);
+  color: var(--text2);
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+.btn-icon:hover { background: var(--red); border-color: var(--red); color: white; }
+.btn-icon.edit:hover { background: var(--accent); border-color: var(--accent); color: white; }
+
+.expense-date-divider {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text3);
+  padding: 8px 4px 4px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.expense-date-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+/* ===== WALLETS GRID ===== */
+.wallets-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.wallet-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  transition: all 0.2s;
+}
+.wallet-card:hover { border-color: var(--accent); }
+
+.wallet-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+.wallet-card-name { font-size: 16px; font-weight: 700; }
+.wallet-badge {
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: 20px;
+  background: rgba(139,92,246,0.2);
+  color: var(--purple);
+  border: 1px solid rgba(139,92,246,0.3);
+}
+
+.wallet-balances { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+.wallet-balance-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.wallet-balance-cur { font-size: 12px; color: var(--text2); }
+.wallet-balance-amt {
+  font-size: 20px;
+  font-weight: 700;
+  direction: ltr;
+}
+.wallet-balance-amt.negative { color: var(--red); }
+.wallet-balance-amt.positive { color: var(--green); }
+
+.wallet-balance-sub { font-size: 12px; color: var(--text3); direction: ltr; }
+
+.wallet-card-actions {
+  display: flex;
+  gap: 8px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+
+/* ===== TRIPS LIST ===== */
+.trips-list { display: flex; flex-direction: column; gap: 12px; }
+
+.trip-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+.trip-card:hover { border-color: var(--accent); }
+.trip-card.active-trip { border-color: var(--accent); background: rgba(59,130,246,0.05); }
+
+.trip-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+.trip-name { font-size: 16px; font-weight: 700; }
+.trip-active-badge {
+  font-size: 11px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  background: rgba(34,197,94,0.15);
+  color: var(--green);
+  border: 1px solid rgba(34,197,94,0.3);
+}
+
+.trip-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-size: 13px;
+  color: var(--text2);
+  margin-bottom: 12px;
+}
+.trip-meta span { display: flex; align-items: center; gap: 4px; }
+
+.trip-budget-info { font-size: 14px; color: var(--text); }
+.trip-budget-label { color: var(--text3); font-size: 12px; }
+
+.trip-card-actions {
+  display: flex;
+  gap: 8px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+
+/* ===== CATEGORIES GRID ===== */
+.categories-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px;
+}
+
+.category-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: all 0.2s;
+}
+.category-card:hover { border-color: var(--accent); }
+
+.category-icon-big {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  flex-shrink: 0;
+}
+
+.category-info { flex: 1; }
+.category-name { font-size: 14px; font-weight: 600; }
+
+.category-actions { display: flex; gap: 6px; }
+
+/* ===== SETTINGS ===== */
+.settings-container { max-width: 600px; }
+.settings-section {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  margin-bottom: 20px;
+}
+.settings-section h3 { font-size: 16px; font-weight: 600; margin-bottom: 20px; }
+
+.exchange-rates-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+
+.exchange-rate-item { display: flex; flex-direction: column; gap: 4px; }
+.exchange-rate-item label { font-size: 12px; color: var(--text2); }
+
+/* ===== FORMS ===== */
+.form-group { margin-bottom: 16px; }
+.form-group label { display: block; font-size: 13px; color: var(--text2); margin-bottom: 6px; }
+
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+.form-control {
+  width: 100%;
+  padding: 10px 12px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 14px;
+  transition: border-color 0.2s;
+}
+.form-control:focus { outline: none; border-color: var(--accent); }
+.form-control option { background: var(--bg3); }
+
+.amount-input { font-size: 20px; font-weight: 700; text-align: left; direction: ltr; }
+.emoji-input { font-size: 24px; text-align: center; }
+.color-input { height: 42px; cursor: pointer; padding: 4px; }
+
+.checkbox-label {
+  display: flex !important;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  color: var(--text) !important;
+  font-size: 14px !important;
+}
+.checkbox-label input { width: 16px; height: 16px; }
+
+.wallet-hint {
+  margin-top: 6px;
+  padding: 8px 12px;
+  background: rgba(59,130,246,0.1);
+  border: 1px solid rgba(59,130,246,0.3);
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  color: var(--accent);
+}
+
+.conversion-box {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 12px;
+  font-size: 13px;
+  color: var(--text2);
+  margin-top: 8px;
+}
+
+.info-box {
+  background: rgba(59,130,246,0.1);
+  border: 1px solid rgba(59,130,246,0.3);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  font-size: 13px;
+  color: var(--accent);
+  margin-bottom: 16px;
+}
+
+.trip-duration-hint {
+  background: var(--bg3);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  font-size: 13px;
+  color: var(--text2);
+  margin-top: -8px;
+  margin-bottom: 12px;
+}
+
+/* ===== BUTTONS ===== */
+.btn-primary {
+  padding: 10px 20px;
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: var(--font);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.btn-primary:hover { background: var(--accent2); }
+
+.btn-secondary {
+  padding: 10px 20px;
+  background: var(--bg3);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-family: var(--font);
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-secondary:hover { background: var(--bg4); }
+
+.btn-danger {
+  padding: 10px 20px;
+  background: rgba(239,68,68,0.15);
+  color: var(--red);
+  border: 1px solid rgba(239,68,68,0.3);
+  border-radius: var(--radius-sm);
+  font-family: var(--font);
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-danger:hover { background: var(--red); color: white; }
+
+.btn-success {
+  padding: 10px 20px;
+  background: rgba(34,197,94,0.15);
+  color: var(--green);
+  border: 1px solid rgba(34,197,94,0.3);
+  border-radius: var(--radius-sm);
+  font-family: var(--font);
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-success:hover { background: var(--green); color: white; }
+
+.filter-select {
+  padding: 7px 12px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 13px;
+}
+
+/* ===== MODALS ===== */
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.modal-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(4px);
+}
+
+.modal-content {
+  position: relative;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  width: 100%;
+  max-width: 520px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: var(--shadow);
+  animation: slideUp 0.2s ease;
+}
+
+.modal-sm { max-width: 380px; }
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border);
+}
+.modal-header h3 { font-size: 16px; font-weight: 700; }
+.modal-close {
+  background: none;
+  border: none;
+  color: var(--text2);
+  font-size: 18px;
+  cursor: pointer;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.modal-close:hover { background: var(--bg3); color: var(--text); }
+
+.modal-body { padding: 24px; }
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 16px 24px;
+  border-top: 1px solid var(--border);
+}
+
+.category-select { font-size: 14px; }
+
+.wallet-income-info {
+  background: var(--bg3);
+  border-radius: var(--radius-sm);
+  padding: 12px;
+  margin-bottom: 16px;
+  font-size: 13px;
+  color: var(--text2);
+}
+
+/* ===== EMPTY STATE ===== */
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--text3);
+}
+.empty-icon { font-size: 48px; margin-bottom: 12px; }
+.empty-state p { font-size: 16px; }
+
+/* ===== TOAST ===== */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 12px 24px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 30px;
+  font-size: 14px;
+  z-index: 999;
+  box-shadow: var(--shadow);
+  animation: fadeInUp 0.3s ease;
+}
+.toast.success { border-color: var(--green); color: var(--green); }
+.toast.error { border-color: var(--red); color: var(--red); }
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateX(-50%) translateY(10px); }
+  to { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .sidebar {
+    transform: translateX(100%);
+  }
+  .sidebar.open {
+    transform: translateX(0);
+  }
+  .sidebar-overlay.active { display: block; }
+  .sidebar-close { display: flex; }
+
+  .main-content { margin-right: 0; }
+  .menu-btn { display: block; }
+
+  .dashboard-grid { grid-template-columns: 1fr 1fr; }
+  .wallets-grid { grid-template-columns: 1fr; }
+  .form-row { grid-template-columns: 1fr; }
+  .exchange-rates-grid { grid-template-columns: 1fr; }
+
+  .expense-item { flex-wrap: wrap; }
+  .expense-actions { margin-right: auto; }
+}
+
+@media (max-width: 480px) {
+  .dashboard-grid { grid-template-columns: 1fr; }
+  .page-content { padding: 16px; }
+  .topbar { padding: 0 12px; }
+}
+
+  </style>
 </head>
 <body>
-<div class="hdr"><h1>✈️ ميزانية السفر</h1><div class="sub">إدارة مصاريف رحلاتك</div></div>
-<div class="trip-sel"><select id="tripSel" onchange="onTrip()"><option value="">⏳ جاري التحميل...</option></select></div>
-<div class="tabs">
-  <div class="tab active" data-t="summary" onclick="sw('summary')"><span class="tab-ic">📊</span>الملخص</div>
-  <div class="tab" data-t="add-exp" onclick="sw('add-exp')"><span class="tab-ic">➕</span>مصروف</div>
-  <div class="tab" data-t="expenses" onclick="sw('expenses')"><span class="tab-ic">📋</span>المصاريف</div>
-  <div class="tab" data-t="add-inc" onclick="sw('add-inc')"><span class="tab-ic">💰</span>دخل</div>
-</div>
-<div class="cnt">
-  <div id="t-summary" class="tc active"><div id="sumBox"><div class="ld"><div class="sp"></div>جاري التحميل...</div></div></div>
-
-  <div id="t-add-exp" class="tc"><div class="fc">
-    <div class="ft">➕ مصروف جديد</div>
-    <div class="fg"><label>المحفظة</label><select id="xW" onchange="xWch()"><option value="">اختر المحفظة</option></select></div>
-    <div class="fg"><label>فئة المصروف</label><select id="xC"><option value="">اختر الفئة</option></select></div>
-    <div class="fg"><label>المبلغ</label><input type="number" id="xA" placeholder="أدخل المبلغ" oninput="xAin()"></div>
-    <div class="fg"><label>التاريخ</label><input type="date" id="xD"></div>
-    <div id="avBox" class="av" style="display:none">
-      <div class="av-l">💳 المبلغ المتاح في المحفظة</div>
-      <div class="av-a" id="avAmt">-</div>
-      <div class="av-c" id="avCnv">-</div>
-      <div class="dp" id="dpBox" style="display:none">
-        <div>⬇️ بعد الخصم:</div>
-        <div class="aa" id="dpAmt">-</div>
-        <div class="av-c" id="dpCnv">-</div>
+  <!-- SETUP SCREEN -->
+  <div id="setupScreen" class="setup-screen hidden">
+    <div class="setup-card">
+      <div class="setup-icon">✈️</div>
+      <h1>ميزانية السفر</h1>
+      <p>أدخل رابط Google Apps Script للبدء</p>
+      <div class="setup-form">
+        <input type="url" id="scriptUrlInput" placeholder="https://script.google.com/macros/s/..." class="setup-input">
+        <button onclick="saveScriptUrl()" class="btn-primary">حفظ والبدء</button>
+      </div>
+      <div class="setup-help">
+        <p>📋 <strong>خطوات الإعداد:</strong></p>
+        <ol>
+          <li>افتح Google Sheets وأنشئ جدولاً جديداً</li>
+          <li>اذهب إلى Extensions → Apps Script</li>
+          <li>الصق محتوى ملف <code>Code.gs</code></li>
+          <li>اضغط Deploy → New Deployment → Web App</li>
+          <li>اضبط "Execute as: Me" و "Who has access: Anyone"</li>
+          <li>انسخ رابط الـ Web App والصقه هنا</li>
+        </ol>
       </div>
     </div>
-    <button class="btn btn-p" id="btnX" onclick="subX()" disabled>إضافة المصروف</button>
-  </div></div>
+  </div>
 
-  <div id="t-expenses" class="tc"><div id="expBox"><div class="ld"><div class="sp"></div>جاري التحميل...</div></div></div>
+  <!-- LOADING -->
+  <div id="loadingScreen" class="loading-screen">
+    <div class="loading-spinner"></div>
+    <p>جاري التحميل...</p>
+  </div>
 
-  <div id="t-add-inc" class="tc"><div class="fc">
-    <div class="ft">💰 إضافة دخل</div>
-    <div class="fg"><label>المحفظة</label><select id="iW"><option value="">اختر المحفظة</option></select></div>
-    <div class="fg"><label>عملة المحفظة</label><select id="iCur"><option value="">اختر العملة</option></select></div>
-    <div class="fg"><label>المبلغ</label><input type="number" id="iA" placeholder="أدخل المبلغ"></div>
-    <button class="btn btn-p" id="btnI" onclick="subI()">إضافة الدخل</button>
-  </div></div>
-</div>
+  <!-- MAIN APP -->
+  <div id="app" class="hidden">
+    <!-- Sidebar -->
+    <nav class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="app-logo">✈️</div>
+        <div class="app-title">
+          <span class="title-main">ميزانية</span>
+          <span class="title-sub">السفر</span>
+        </div>
+        <button class="sidebar-close" onclick="toggleSidebar()">✕</button>
+      </div>
 
-<div class="tb" id="tBar" style="display:none">
-  <div class="ti"><div class="tl">إجمالي الدخل</div><div class="tv pos" id="tInc">-</div></div>
-  <div class="ti"><div class="tl">إجمالي المصاريف</div><div class="tv neg" id="tExp">-</div></div>
-  <div class="ti"><div class="tl">المتبقي</div><div class="tv" id="tRem">-</div></div>
-</div>
-<div class="toast" id="toast"></div>
-<script>
-// ╔═══════════════════════════════════════════════╗
-// ║  غيّر هذا إلى رابط الـ Web App الخاص بك      ║
-// ╚═══════════════════════════════════════════════╝
-const API = 'https://script.google.com/macros/s/AKfycbwxUvcoJGteFSWGz9jR9SGYbz-OLxZUq3d1m9Zu8se08Qm9_wFCoUvDitUzq4-QrtczQw/exec';
+      <div class="sidebar-trip-selector">
+        <label>الرحلة الحالية</label>
+        <select id="activeTripSelect" onchange="setActiveTrip(this.value)" class="trip-select">
+          <option value="">-- اختر رحلة --</option>
+        </select>
+      </div>
 
-let D=null, tripId="";
+      <ul class="nav-menu">
+        <li><a href="#" onclick="showPage('dashboard')" class="nav-item active" data-page="dashboard"><span class="nav-icon">📊</span> لوحة التحكم</a></li>
+        <li><a href="#" onclick="showPage('expenses')" class="nav-item" data-page="expenses"><span class="nav-icon">💸</span> المصاريف</a></li>
+        <li><a href="#" onclick="showPage('wallets')" class="nav-item" data-page="wallets"><span class="nav-icon">👛</span> المحافظ</a></li>
+        <li><a href="#" onclick="showPage('trips')" class="nav-item" data-page="trips"><span class="nav-icon">🗺️</span> الرحلات</a></li>
+        <li><a href="#" onclick="showPage('categories')" class="nav-item" data-page="categories"><span class="nav-icon">🏷️</span> الفئات</a></li>
+        <li><a href="#" onclick="showPage('settings')" class="nav-item" data-page="settings"><span class="nav-icon">⚙️</span> الإعدادات</a></li>
+      </ul>
 
-// ══ تحميل البيانات ══
-async function load(){
-  try{
-    const r=await fetch(API+'?action=getAll');
-    D=await r.json();
-    fillTrips();fillWallets();fillCats();fillCurs();
-    if(D.trips?.length){
-      document.getElementById("tripSel").value=D.trips[0].id;
-      tripId=D.trips[0].id; render();
+      <div class="sidebar-footer">
+        <button onclick="syncData()" class="btn-sync">🔄 مزامنة</button>
+        <button onclick="changeScript()" class="btn-link">تغيير الرابط</button>
+      </div>
+    </nav>
+
+    <!-- Overlay -->
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Top Bar -->
+      <header class="topbar">
+        <button class="menu-btn" onclick="toggleSidebar()">☰</button>
+        <h2 class="page-title" id="pageTitle">لوحة التحكم</h2>
+        <div class="topbar-actions">
+          <button class="btn-add-expense" onclick="openExpenseModal()">+ مصروف</button>
+        </div>
+      </header>
+
+      <!-- Pages -->
+      <div class="page-content">
+
+        <!-- DASHBOARD PAGE -->
+        <div id="page-dashboard" class="page active">
+          <div id="dashboardContent">
+            <div class="empty-state">
+              <div class="empty-icon">🗺️</div>
+              <p>اختر رحلة من القائمة الجانبية</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- EXPENSES PAGE -->
+        <div id="page-expenses" class="page">
+          <div class="page-header">
+            <h3>سجل المصاريف</h3>
+            <div class="page-header-actions">
+              <select id="expenseFilter" onchange="filterExpenses(this.value)" class="filter-select">
+                <option value="all">كل المصاريف</option>
+                <option value="today">اليوم</option>
+                <option value="week">هذا الأسبوع</option>
+              </select>
+              <button onclick="openExpenseModal()" class="btn-primary">+ إضافة مصروف</button>
+            </div>
+          </div>
+          <div id="expensesList" class="expenses-list"></div>
+        </div>
+
+        <!-- WALLETS PAGE -->
+        <div id="page-wallets" class="page">
+          <div class="page-header">
+            <h3>المحافظ</h3>
+            <button onclick="openWalletModal()" class="btn-primary">+ إضافة محفظة</button>
+          </div>
+          <div id="walletsList" class="wallets-grid"></div>
+        </div>
+
+        <!-- TRIPS PAGE -->
+        <div id="page-trips" class="page">
+          <div class="page-header">
+            <h3>الرحلات</h3>
+            <button onclick="openTripModal()" class="btn-primary">+ إضافة رحلة</button>
+          </div>
+          <div id="tripsList" class="trips-list"></div>
+        </div>
+
+        <!-- CATEGORIES PAGE -->
+        <div id="page-categories" class="page">
+          <div class="page-header">
+            <h3>فئات المصاريف</h3>
+            <button onclick="openCategoryModal()" class="btn-primary">+ إضافة فئة</button>
+          </div>
+          <div id="categoriesList" class="categories-grid"></div>
+        </div>
+
+        <!-- SETTINGS PAGE -->
+        <div id="page-settings" class="page">
+          <div class="settings-container">
+            <div class="settings-section">
+              <h3>💱 أسعار الصرف</h3>
+              <div id="exchangeRates" class="exchange-rates-grid"></div>
+              <button onclick="saveSettings()" class="btn-primary">حفظ الإعدادات</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- ===== MODALS ===== -->
+
+  <!-- Expense Modal -->
+  <div id="expenseModal" class="modal hidden">
+    <div class="modal-overlay" onclick="closeModal('expenseModal')"></div>
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="expenseModalTitle">إضافة مصروف</h3>
+        <button onclick="closeModal('expenseModal')" class="modal-close">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-row">
+          <div class="form-group">
+            <label>الرحلة</label>
+            <select id="expTripId" class="form-control" required></select>
+          </div>
+          <div class="form-group">
+            <label>التاريخ</label>
+            <input type="date" id="expDate" class="form-control">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>الفئة</label>
+            <select id="expCategory" class="form-control category-select" onchange="updateCategoryIcon()" required></select>
+          </div>
+          <div class="form-group">
+            <label>الوصف</label>
+            <input type="text" id="expDesc" class="form-control" placeholder="وصف اختياري">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>العملة</label>
+            <select id="expCurrency" class="form-control" onchange="onCurrencyChange()">
+              <option value="SAR">ريال سعودي (SAR)</option>
+              <option value="MAD">درهم مغربي (MAD)</option>
+              <option value="USD">دولار (USD)</option>
+              <option value="EUR">يورو (EUR)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>المحفظة</label>
+            <select id="expWallet" class="form-control" onchange="onWalletChange()"></select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>المبلغ</label>
+          <input type="number" id="expAmount" class="form-control amount-input" placeholder="0.00" step="0.01" min="0">
+          <div id="walletBalanceHint" class="wallet-hint"></div>
+        </div>
+        <div id="conversionDisplay" class="conversion-box hidden"></div>
+      </div>
+      <div class="modal-footer">
+        <button onclick="closeModal('expenseModal')" class="btn-secondary">إلغاء</button>
+        <button onclick="saveExpense()" class="btn-primary">حفظ المصروف</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Wallet Modal -->
+  <div id="walletModal" class="modal hidden">
+    <div class="modal-overlay" onclick="closeModal('walletModal')"></div>
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="walletModalTitle">إضافة محفظة</h3>
+        <button onclick="closeModal('walletModal')" class="modal-close">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>اسم المحفظة</label>
+          <input type="text" id="walletName" class="form-control" placeholder="مثال: برق">
+        </div>
+        <div class="form-group">
+          <label>العملة الرئيسية</label>
+          <select id="walletCurrency" class="form-control" onchange="toggleMultiCurrency()">
+            <option value="SAR">ريال سعودي (SAR)</option>
+            <option value="MAD">درهم مغربي (MAD)</option>
+            <option value="USD">دولار (USD)</option>
+            <option value="EUR">يورو (EUR)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="checkbox-label">
+            <input type="checkbox" id="walletMulti" onchange="toggleMultiCurrencyFields()">
+            محفظة متعددة العملات (مثل بطاقة عملات بنك الاستثمار)
+          </label>
+        </div>
+        <div id="multiCurrencyFields" class="hidden">
+          <div class="info-box">هذه المحفظة ستدعم إيداع وسحب بنفس العملة (درهم مغربي بدون تحويل)</div>
+        </div>
+        <div class="form-group">
+          <label>الرصيد الافتتاحي</label>
+          <input type="number" id="walletBalance" class="form-control" value="0" step="0.01" min="0">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button onclick="closeModal('walletModal')" class="btn-secondary">إلغاء</button>
+        <button onclick="saveWallet()" class="btn-primary">حفظ</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Wallet Income Modal -->
+  <div id="walletIncomeModal" class="modal hidden">
+    <div class="modal-overlay" onclick="closeModal('walletIncomeModal')"></div>
+    <div class="modal-content modal-sm">
+      <div class="modal-header">
+        <h3>إيداع / شحن محفظة</h3>
+        <button onclick="closeModal('walletIncomeModal')" class="modal-close">✕</button>
+      </div>
+      <div class="modal-body">
+        <div id="walletIncomeInfo" class="wallet-income-info"></div>
+        <div class="form-group">
+          <label>مبلغ الإيداع</label>
+          <input type="number" id="incomeAmount" class="form-control" placeholder="0.00" step="0.01" min="0">
+        </div>
+        <div class="form-group" id="incomeCurrencyGroup">
+          <label>العملة</label>
+          <select id="incomeCurrency" class="form-control"></select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button onclick="closeModal('walletIncomeModal')" class="btn-secondary">إلغاء</button>
+        <button onclick="saveWalletIncome()" class="btn-primary">إيداع</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Trip Modal -->
+  <div id="tripModal" class="modal hidden">
+    <div class="modal-overlay" onclick="closeModal('tripModal')"></div>
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="tripModalTitle">إضافة رحلة</h3>
+        <button onclick="closeModal('tripModal')" class="modal-close">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>اسم الرحلة</label>
+          <input type="text" id="tripName" class="form-control" placeholder="مثال: SV372 - المغرب 2025">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>تاريخ البداية</label>
+            <input type="date" id="tripStart" class="form-control">
+          </div>
+          <div class="form-group">
+            <label>تاريخ النهاية</label>
+            <input type="date" id="tripEnd" class="form-control">
+          </div>
+        </div>
+        <div id="tripDuration" class="trip-duration-hint"></div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>الميزانية التقديرية (ريال)</label>
+            <input type="number" id="tripBudget" class="form-control" placeholder="0" step="100" min="0" oninput="updateBudgetConversion()">
+          </div>
+          <div class="form-group">
+            <label>العملة للعرض</label>
+            <select id="tripCurrency" class="form-control" onchange="updateBudgetConversion()">
+              <option value="SAR">ريال سعودي</option>
+              <option value="MAD">درهم مغربي</option>
+              <option value="USD">دولار</option>
+              <option value="EUR">يورو</option>
+            </select>
+          </div>
+        </div>
+        <div id="budgetConversion" class="conversion-box"></div>
+        <div class="form-group">
+          <label>ملاحظات</label>
+          <textarea id="tripNotes" class="form-control" rows="2"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button onclick="closeModal('tripModal')" class="btn-secondary">إلغاء</button>
+        <button onclick="saveTrip()" class="btn-primary">حفظ الرحلة</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Category Modal -->
+  <div id="categoryModal" class="modal hidden">
+    <div class="modal-overlay" onclick="closeModal('categoryModal')"></div>
+    <div class="modal-content modal-sm">
+      <div class="modal-header">
+        <h3 id="categoryModalTitle">إضافة فئة</h3>
+        <button onclick="closeModal('categoryModal')" class="modal-close">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>اسم الفئة</label>
+          <input type="text" id="catName" class="form-control">
+        </div>
+        <div class="form-group">
+          <label>الأيقونة (Emoji)</label>
+          <input type="text" id="catIcon" class="form-control emoji-input" placeholder="مثال: 🍕" maxlength="4">
+        </div>
+        <div class="form-group">
+          <label>اللون</label>
+          <input type="color" id="catColor" class="form-control color-input" value="#3B82F6">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button onclick="closeModal('categoryModal')" class="btn-secondary">إلغاء</button>
+        <button onclick="saveCategory()" class="btn-primary">حفظ</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="toast hidden"></div>
+
+  <script>
+// =============================================
+// Travel Budget Manager - Main App Logic
+// =============================================
+
+let SCRIPT_URL = '';
+let state = {
+  wallets: [],
+  trips: [],
+  expenses: [],
+  categories: [],
+  settings: {},
+  activeTrip: null,
+  editingExpense: null,
+  editingWallet: null,
+  editingTrip: null,
+  editingCategory: null,
+  incomeWalletId: null,
+};
+
+// ===== INIT =====
+async function init() {
+  SCRIPT_URL = localStorage.getItem('scriptUrl') || '';
+  if (!SCRIPT_URL) {
+    showSetup();
+    return;
+  }
+  showLoading();
+  try {
+    await loadAllData();
+    const savedTrip = localStorage.getItem('activeTrip');
+    if (savedTrip && state.trips.find(t => t.id === savedTrip)) {
+      state.activeTrip = savedTrip;
+    } else if (state.trips.length > 0) {
+      state.activeTrip = state.trips[0].id;
     }
-  }catch(e){msg('خطأ: '+e.message,'error');}
+    showApp();
+    renderAll();
+  } catch(e) {
+    showSetup();
+    showToast('فشل الاتصال. تحقق من الرابط', 'error');
+  }
 }
 
-// ══ تعبئة القوائم ══
-function fillTrips(){
-  const s=document.getElementById("tripSel");
-  s.innerHTML='<option value="">اختر الرحلة</option>';
-  (D.trips||[]).forEach(t=>{const o=document.createElement("option");o.value=t.id;o.textContent=t.name+" ("+t.flightNo+") — "+t.country;s.appendChild(o);});
+function showSetup() {
+  document.getElementById('loadingScreen').classList.add('hidden');
+  document.getElementById('app').classList.add('hidden');
+  document.getElementById('setupScreen').classList.remove('hidden');
 }
-function fillWallets(){
-  ["xW","iW"].forEach(id=>{
-    const s=document.getElementById(id);
-    s.innerHTML='<option value="">اختر المحفظة</option>';
-    (D.wallets||[]).forEach(w=>{const o=document.createElement("option");o.value=w.key;o.textContent=w.name+" ("+w.cardCurrency+")";o.dataset.cc=w.cardCurrency;s.appendChild(o);});
+
+function showLoading() {
+  document.getElementById('loadingScreen').classList.remove('hidden');
+  document.getElementById('app').classList.add('hidden');
+  document.getElementById('setupScreen').classList.add('hidden');
+}
+
+function showApp() {
+  document.getElementById('loadingScreen').classList.add('hidden');
+  document.getElementById('setupScreen').classList.add('hidden');
+  document.getElementById('app').classList.remove('hidden');
+}
+
+async function saveScriptUrl() {
+  const url = document.getElementById('scriptUrlInput').value.trim();
+  if (!url.startsWith('https://script.google.com')) {
+    showToast('الرابط غير صحيح', 'error'); return;
+  }
+  localStorage.setItem('scriptUrl', url);
+  SCRIPT_URL = url;
+  showLoading();
+  try {
+    await api('GET', { action: 'initSheets' });
+    await loadAllData();
+    showApp();
+    renderAll();
+    showToast('تم الاتصال بنجاح! ✅', 'success');
+  } catch(e) {
+    showSetup();
+    showToast('فشل الاتصال: ' + e.message, 'error');
+  }
+}
+
+function changeScript() {
+  localStorage.removeItem('scriptUrl');
+  showSetup();
+}
+
+// ===== API =====
+async function api(method, params) {
+  if (method === 'GET') {
+    const qs = Object.entries(params).map(([k,v]) => `${k}=${encodeURIComponent(v)}`).join('&');
+    const res = await fetch(`${SCRIPT_URL}?${qs}`);
+    const data = await res.json();
+    if (data.error) throw new Error(data.error);
+    return data;
+  } else {
+    const res = await fetch(SCRIPT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(params),
+    });
+    const data = await res.json();
+    if (data.error) throw new Error(data.error);
+    return data;
+  }
+}
+
+async function loadAllData() {
+  const [wallets, trips, categories, settings] = await Promise.all([
+    api('GET', { action: 'getWallets' }),
+    api('GET', { action: 'getTrips' }),
+    api('GET', { action: 'getCategories' }),
+    api('GET', { action: 'getSettings' }),
+  ]);
+  state.wallets = wallets;
+  state.trips = trips;
+  state.categories = categories;
+  state.settings = settings;
+
+  // Load expenses for active trip
+  if (state.activeTrip) {
+    state.expenses = await api('GET', { action: 'getExpenses', tripId: state.activeTrip });
+  }
+}
+
+async function syncData() {
+  showToast('جاري المزامنة...', '');
+  try {
+    await loadAllData();
+    renderAll();
+    showToast('تم التحديث ✅', 'success');
+  } catch(e) {
+    showToast('فشل التحديث', 'error');
+  }
+}
+
+// ===== EXCHANGE =====
+function getRate(from, to) {
+  if (from === to) return 1;
+  const s = state.settings;
+  const map = {
+    'MAD_SAR': parseFloat(s.MAD_to_SAR || 0.42),
+    'SAR_MAD': parseFloat(s.SAR_to_MAD || 2.38),
+    'USD_SAR': parseFloat(s.USD_to_SAR || 3.75),
+    'SAR_USD': parseFloat(1 / parseFloat(s.USD_to_SAR || 3.75)),
+    'EUR_SAR': parseFloat(s.EUR_to_SAR || 4.10),
+    'SAR_EUR': parseFloat(1 / parseFloat(s.EUR_to_SAR || 4.10)),
+    'MAD_USD': parseFloat(s.MAD_to_SAR || 0.42) / parseFloat(s.USD_to_SAR || 3.75),
+    'MAD_EUR': parseFloat(s.MAD_to_SAR || 0.42) / parseFloat(s.EUR_to_SAR || 4.10),
+  };
+  return map[`${from}_${to}`] || 1;
+}
+
+function convert(amount, from, to) {
+  return amount * getRate(from, to);
+}
+
+function fmt(amount, currency) {
+  const symbols = { SAR: 'ر.س', MAD: 'د.م', USD: '$', EUR: '€' };
+  return `${parseFloat(amount).toLocaleString('ar-SA', {minimumFractionDigits:0,maximumFractionDigits:2})} ${symbols[currency] || currency}`;
+}
+
+// ===== RENDER ALL =====
+function renderAll() {
+  renderTripSelector();
+  renderDashboard();
+  renderExpenses();
+  renderWallets();
+  renderTrips();
+  renderCategories();
+  renderSettings();
+}
+
+// ===== TRIP SELECTOR =====
+function renderTripSelector() {
+  const sel = document.getElementById('activeTripSelect');
+  sel.innerHTML = '<option value="">-- اختر رحلة --</option>' +
+    state.trips.map(t => `<option value="${t.id}" ${t.id === state.activeTrip ? 'selected' : ''}>${t.name}</option>`).join('');
+}
+
+async function setActiveTrip(id) {
+  state.activeTrip = id;
+  localStorage.setItem('activeTrip', id);
+  if (id) {
+    showLoading();
+    try {
+      state.expenses = await api('GET', { action: 'getExpenses', tripId: id });
+    } catch(e) { state.expenses = []; }
+    showApp();
+  } else {
+    state.expenses = [];
+  }
+  renderAll();
+}
+
+// ===== DASHBOARD =====
+function renderDashboard() {
+  const el = document.getElementById('dashboardContent');
+  if (!state.activeTrip) {
+    el.innerHTML = `<div class="empty-state"><div class="empty-icon">🗺️</div><p>اختر رحلة من القائمة الجانبية للبدء</p></div>`;
+    return;
+  }
+
+  const trip = state.trips.find(t => t.id === state.activeTrip);
+  if (!trip) return;
+
+  const expenses = state.expenses;
+  let totalSAR = 0, totalMAD = 0;
+  const byCat = {};
+
+  expenses.forEach(e => {
+    const amt = parseFloat(e.amount);
+    const cur = e.currency;
+    const sarAmt = convert(amt, cur, 'SAR');
+    totalSAR += sarAmt;
+    totalMAD += convert(amt, cur, 'MAD');
+    const cat = e.category;
+    if (!byCat[cat]) byCat[cat] = { total: 0, icon: e.categoryIcon || '📦' };
+    byCat[cat].total += sarAmt;
   });
-}
-function fillCats(){
-  const s=document.getElementById("xC");
-  s.innerHTML='<option value="">اختر الفئة</option>';
-  (D.categories||[]).forEach(c=>{const o=document.createElement("option");o.value=c;o.textContent=c;s.appendChild(o);});
-}
-function fillCurs(){
-  const s=document.getElementById("iCur");
-  s.innerHTML='<option value="">اختر العملة</option>';
-  ['ريال سعودي','درهم مغربي','دولار أمريكي','درهم اماراتي'].forEach(c=>{const o=document.createElement('option');o.value=c;o.textContent=c;s.appendChild(o);});
+
+  const budget = parseFloat(trip.estimatedBudgetSAR || 0);
+  const pct = budget > 0 ? Math.min((totalSAR / budget) * 100, 100) : 0;
+  const remaining = budget - totalSAR;
+  const tripCur = trip.currency || 'SAR';
+  const budgetInCur = convert(budget, 'SAR', tripCur);
+  const totalInCur = convert(totalSAR, 'SAR', tripCur);
+
+  // Duration
+  const startD = trip.startDate ? new Date(trip.startDate) : null;
+  const endD = trip.endDate ? new Date(trip.endDate) : null;
+  const duration = (startD && endD) ? Math.ceil((endD - startD) / 86400000) : '-';
+
+  // Category bars
+  const sortedCats = Object.entries(byCat).sort((a,b) => b[1].total - a[1].total);
+  const maxCat = sortedCats[0]?.[1].total || 1;
+
+  const walletCards = state.wallets.map(w => {
+    if (w.isMultiCurrency) {
+      const bals = w.balances || {};
+      const lines = Object.entries(bals).filter(([,v]) => v != 0)
+        .map(([cur,val]) => `<div class="wallet-mini-balance">${fmt(val, cur)}</div>`).join('');
+      return `<div class="wallet-mini" onclick="showPage('wallets')">
+        <div class="wallet-mini-name">${w.name}</div>
+        ${lines || `<div class="wallet-mini-balance">0</div>`}
+        <div class="wallet-mini-currency">متعددة العملات</div>
+      </div>`;
+    }
+    const color = w.balance < 0 ? 'var(--red)' : w.balance > 0 ? 'var(--green)' : 'var(--text)';
+    return `<div class="wallet-mini" onclick="showPage('wallets')">
+      <div class="wallet-mini-name">${w.name}</div>
+      <div class="wallet-mini-balance" style="color:${color}">${fmt(w.balance, w.currency)}</div>
+      <div class="wallet-mini-currency">${w.currency}</div>
+    </div>`;
+  }).join('');
+
+  el.innerHTML = `
+    <div class="dashboard-grid">
+      <div class="stat-card blue">
+        <div class="stat-icon">✈️</div>
+        <div class="stat-label">الرحلة</div>
+        <div class="stat-value" style="font-size:16px">${trip.name}</div>
+        <div class="stat-sub">${duration !== '-' ? duration + ' يوم' : ''}</div>
+      </div>
+      <div class="stat-card red">
+        <div class="stat-icon">💸</div>
+        <div class="stat-label">إجمالي المصاريف</div>
+        <div class="stat-value">${fmt(totalInCur, tripCur)}</div>
+        <div class="stat-sub">${tripCur !== 'SAR' ? fmt(totalSAR, 'SAR') : ''}</div>
+      </div>
+      <div class="stat-card ${remaining < 0 ? 'red' : 'green'}">
+        <div class="stat-icon">${remaining < 0 ? '⚠️' : '✅'}</div>
+        <div class="stat-label">المتبقي من الميزانية</div>
+        <div class="stat-value">${fmt(convert(remaining,'SAR',tripCur), tripCur)}</div>
+        <div class="stat-sub">من ${fmt(budgetInCur, tripCur)}</div>
+      </div>
+      <div class="stat-card yellow">
+        <div class="stat-icon">🧾</div>
+        <div class="stat-label">عدد المصاريف</div>
+        <div class="stat-value">${expenses.length}</div>
+        <div class="stat-sub">معاملة</div>
+      </div>
+    </div>
+
+    ${budget > 0 ? `
+    <div class="trip-progress">
+      <div class="progress-header">
+        <span class="section-title" style="margin:0">استهلاك الميزانية</span>
+        <span style="font-weight:700;color:${pct > 90 ? 'var(--red)' : 'var(--accent)'}">${pct.toFixed(1)}%</span>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill ${pct >= 100 ? 'over' : ''}" style="width:${pct}%"></div>
+      </div>
+      <div class="progress-labels">
+        <span>0</span>
+        <span>${fmt(budgetInCur / 2, tripCur)}</span>
+        <span>${fmt(budgetInCur, tripCur)}</span>
+      </div>
+    </div>` : ''}
+
+    <div class="section-title">👛 المحافظ</div>
+    <div class="wallets-summary">${walletCards}</div>
+
+    ${sortedCats.length > 0 ? `
+    <div class="section-title">📊 المصاريف حسب الفئة</div>
+    <div class="category-chart">
+      ${sortedCats.map(([cat, info]) => `
+        <div class="cat-bar-row">
+          <div class="cat-bar-label">${info.icon} ${cat}</div>
+          <div class="cat-bar-track"><div class="cat-bar-fill" style="width:${(info.total/maxCat*100).toFixed(1)}%"></div></div>
+          <div class="cat-bar-amount">${fmt(convert(info.total,'SAR',tripCur), tripCur)}</div>
+        </div>
+      `).join('')}
+    </div>` : ''}
+  `;
 }
 
-// ══ التبويبات ══
-function sw(t){
-  document.querySelectorAll(".tab").forEach(e=>e.classList.remove("active"));
-  document.querySelectorAll(".tc").forEach(e=>e.classList.remove("active"));
-  document.querySelector("[data-t=\""+t+"\"]").classList.add("active");
-  document.getElementById("t-"+t).classList.add("active");
-}
-function onTrip(){tripId=document.getElementById("tripSel").value;if(tripId)render();}
-function render(){renderSum();renderExp();resetForm();}
+// ===== EXPENSES =====
+function renderExpenses() {
+  const el = document.getElementById('expensesList');
+  if (!state.activeTrip) {
+    el.innerHTML = `<div class="empty-state"><div class="empty-icon">💸</div><p>اختر رحلة أولاً</p></div>`;
+    return;
+  }
 
-// ══ عرض الملخص ══
-function renderSum(){
-  const box=document.getElementById("sumBox");
-  const sm=(D.summary||[]).filter(s=>!tripId||s.tripId===tripId);
-  if(!sm.length){box.innerHTML='<div class="es"><div class="ic">📭</div><p>لا توجد بيانات</p></div>';document.getElementById("tBar").style.display="none";return;}
-  let h="",gi=0,ge=0;
-  sm.forEach(s=>{
-    const neg=s.remaining<0;gi+=s.totalIncome;ge+=s.totalExpenses;
-    h+='<div class="sc"><div class="sc-h"><span class="wn">🏦 '+s.walletName+'</span><span class="wc">'+s.currency+'</span></div>'+
-    '<div class="sc-b">'+
-    '<div class="sr"><span class="sl">💰 الدخل</span><div class="sv"><div class="sa pos">'+fn(s.totalIncome)+' '+cs(s.currency)+'</div><div class="sac">≈ '+fn(cv(s.totalIncome,s.currency))+' '+cs(opp(s.currency))+'</div></div></div>'+
-    '<div class="sr"><span class="sl">💸 المصاريف</span><div class="sv"><div class="sa neg">'+fn(s.totalExpenses)+' '+cs(s.currency)+'</div><div class="sac">≈ '+fn(cv(s.totalExpenses,s.currency))+' '+cs(opp(s.currency))+'</div></div></div>'+
-    '<div class="rh'+(neg?' negative':'')+'"><div class="av-l">المتبقي</div><div class="rb '+(neg?"neg":"pos")+'">'+fn(s.remaining)+' '+cs(s.currency)+'</div><div class="rcb">≈ '+fn(s.remainingConverted)+' '+cs(s.convertedCurrency)+'</div></div>'+
-    '</div></div>';
+  const expenses = [...state.expenses].sort((a,b) => {
+    const da = new Date(a.date || a.createdAt);
+    const db = new Date(b.date || b.createdAt);
+    return db - da;
   });
-  box.innerHTML=h;
-  const gr=gi-ge;
-  document.getElementById("tBar").style.display="flex";
-  document.getElementById("tInc").textContent=fn(gi);
-  document.getElementById("tExp").textContent=fn(ge);
-  const re=document.getElementById("tRem");re.textContent=fn(gr);re.className="tv "+(gr<0?"neg":"pos");
-}
-// ══ عرض المصاريف ══
-function renderExp(){
-  const box=document.getElementById("expBox");
-  const ex=(D.expenses||[]).filter(e=>!tripId||e.tripId===tripId);
-  if(!ex.length){box.innerHTML='<div class="es"><div class="ic">📝</div><p>لا توجد مصاريف</p></div>';return;}
-  ex.sort((a,b)=>(b.date||"").localeCompare(a.date||""));
-  let h="",cd="";
-  ex.forEach(e=>{
-    if(e.date!==cd){cd=e.date;h+='<div class="dh">📅 '+e.date+' — '+e.day+'</div>';}
-    const cnv=e.walletCurrency==="ريال سعودي"?"≈ "+fn(e.sarToMad)+" د.م":"≈ "+fn(e.madToSar)+" ر.س";
-    h+='<div class="ei"><div class="er"><div class="ec">'+e.category+'</div><div class="em">'+e.walletName+' · '+
-    (e.time||"")+'</div></div><div class="el"><div class="ea">-'+fn(e.amount)+' '+cs(e.walletCurrency)+
-    '</div><div class="eac">'+cnv+'</div></div></div>';
+
+  if (expenses.length === 0) {
+    el.innerHTML = `<div class="empty-state"><div class="empty-icon">💸</div><p>لا توجد مصاريف بعد</p></div>`;
+    return;
+  }
+
+  // Group by date
+  const grouped = {};
+  expenses.forEach(e => {
+    const d = e.date || e.createdAt?.split('T')[0] || '?';
+    if (!grouped[d]) grouped[d] = [];
+    grouped[d].push(e);
   });
-  box.innerHTML=h;
+
+  el.innerHTML = Object.entries(grouped).map(([date, items]) => {
+    const dateLabel = formatDate(date) + (items[0].day ? ` - ${items[0].day}` : '');
+    const dayTotal = items.reduce((s,e) => s + convert(parseFloat(e.amount), e.currency, 'SAR'), 0);
+    return `
+      <div class="expense-date-divider">${dateLabel} <span style="color:var(--text2);font-size:11px">(${fmt(dayTotal,'SAR')})</span></div>
+      ${items.map(e => renderExpenseItem(e)).join('')}
+    `;
+  }).join('');
 }
 
-// ══ المبلغ المتاح أثناء الإدخال ══
-function xWch(){
-  const wk=document.getElementById("xW").value;
-  const bx=document.getElementById("avBox");
-  if(!wk||!tripId){bx.style.display="none";return;}
-  bx.style.display="block";updAv();valForm();
-}
-function xAin(){updAv();valForm();}
-
-function updAv(){
-  const wk=document.getElementById("xW").value;
-  const amt=parseFloat(document.getElementById("xA").value)||0;
-  const bx=document.getElementById("avBox");
-  if(!wk||!tripId){bx.style.display="none";return;}
-  bx.style.display="block";
-  const w=(D.wallets||[]).find(x=>x.key===wk);if(!w)return;
-  const cur=w.cardCurrency;
-  const inc=(D.income||[]).filter(i=>i.tripId===tripId&&i.walletKey===wk&&i.walletCurrency===cur).reduce((s,i)=>s+(i.amount||0),0);
-  const exp=(D.expenses||[]).filter(e=>e.tripId===tripId&&e.walletKey===wk&&e.walletCurrency===cur).reduce((s,e)=>s+(e.amount||0),0);
-  const avail=inc-exp;
-  const after=avail-amt;
-  document.getElementById("avAmt").textContent=fn(avail)+" "+cs(cur);
-  document.getElementById("avAmt").className="av-a "+(avail>=0?"pos":"neg");
-  document.getElementById("avCnv").textContent="≈ "+fn(cv(avail,cur))+" "+cs(opp(cur));
-  const dp=document.getElementById("dpBox");
-  if(amt>0){
-    dp.style.display="block";
-    const da=document.getElementById("dpAmt");da.textContent=fn(after)+" "+cs(cur);da.className="aa "+(after>=0?"pos":"neg");
-    document.getElementById("dpCnv").textContent="≈ "+fn(cv(after,cur))+" "+cs(opp(cur));
-    bx.className="av"+(after<0?" danger":after<avail*.2?" warn":"");
-  }else{dp.style.display="none";bx.className="av";}
+function renderExpenseItem(e) {
+  const sarAmt = convert(parseFloat(e.amount), e.currency, 'SAR');
+  const madAmt = convert(parseFloat(e.amount), e.currency, 'MAD');
+  const showConv = e.currency !== 'SAR';
+  return `
+    <div class="expense-item">
+      <div class="expense-icon">${e.categoryIcon || '📦'}</div>
+      <div class="expense-info">
+        <div class="expense-cat">${e.category}</div>
+        ${e.description ? `<div class="expense-desc">${e.description}</div>` : ''}
+        <div class="expense-meta">${e.wallet || ''} • ${e.time || ''}</div>
+      </div>
+      <div class="expense-amounts">
+        <div class="expense-main-amount">${fmt(e.amount, e.currency)}</div>
+        ${showConv ? `<div class="expense-conv-amount">${fmt(sarAmt,'SAR')}</div>` : ''}
+      </div>
+      <div class="expense-actions">
+        <button class="btn-icon edit" onclick="editExpense('${e.id}')">✏️</button>
+        <button class="btn-icon" onclick="deleteExpense('${e.id}')">🗑️</button>
+      </div>
+    </div>
+  `;
 }
 
-function valForm(){
-  const ok=document.getElementById("xW").value&&document.getElementById("xC").value&&document.getElementById("xA").value;
-  document.getElementById("btnX").disabled=!ok;
+function filterExpenses(val) {
+  // Future: implement filter
+  renderExpenses();
 }
 
-// ══ إرسال مصروف ══
-async function subX(){
-  const btn=document.getElementById("btnX");btn.disabled=true;btn.textContent="⏳ جاري...";
-  const wk=document.getElementById("xW").value;
-  const w=(D.wallets||[]).find(x=>x.key===wk);
-  try{
-    const r=await fetch(API,{method:"POST",body:JSON.stringify({
-      action:"addExpense",tripId,walletKey:wk,
-      category:document.getElementById("xC").value,
-      walletCurrency:w?w.cardCurrency:"ريال سعودي",
-      amount:parseFloat(document.getElementById("xA").value),
-      date:document.getElementById("xD").value||null
-    })});
-    const res=await r.json();
-    if(res.success){msg("✅ تمت إضافة المصروف","success");await load();document.getElementById("tripSel").value=tripId;render();}
-    else msg("❌ "+res.error,"error");
-  }catch(e){msg("❌ "+e.message,"error");}
-  btn.disabled=false;btn.textContent="إضافة المصروف";
+// ===== WALLETS =====
+function renderWallets() {
+  const el = document.getElementById('walletsList');
+  if (state.wallets.length === 0) {
+    el.innerHTML = `<div class="empty-state"><div class="empty-icon">👛</div><p>لا توجد محافظ</p></div>`;
+    return;
+  }
+  el.innerHTML = state.wallets.map(w => renderWalletCard(w)).join('');
 }
 
-// ══ إرسال دخل ══
-async function subI(){
-  const btn=document.getElementById("btnI");btn.disabled=true;btn.textContent="⏳ جاري...";
-  try{
-    const r=await fetch(API,{method:"POST",body:JSON.stringify({
-      action:"addIncome",tripId,
-      walletKey:document.getElementById("iW").value,
-      walletCurrency:document.getElementById("iCur").value,
-      amount:parseFloat(document.getElementById("iA").value)
-    })});
-    const res=await r.json();
-    if(res.success){msg("✅ تم إضافة الدخل","success");await load();document.getElementById("tripSel").value=tripId;render();}
-    else msg("❌ "+res.error,"error");
-  }catch(e){msg("❌ "+e.message,"error");}
-  btn.disabled=false;btn.textContent="إضافة الدخل";
+function renderWalletCard(w) {
+  let balanceHTML = '';
+  if (w.isMultiCurrency) {
+    const bals = w.balances || {};
+    balanceHTML = Object.entries(bals).map(([cur, val]) => {
+      const color = val < 0 ? 'negative' : val > 0 ? 'positive' : '';
+      const sarEquiv = cur !== 'SAR' ? `<div class="wallet-balance-sub">≈ ${fmt(convert(val,cur,'SAR'),'SAR')}</div>` : '';
+      return `
+        <div class="wallet-balance-row">
+          <span class="wallet-balance-cur">${cur}</span>
+          <div>
+            <div class="wallet-balance-amt ${color}">${fmt(val, cur)}</div>
+            ${sarEquiv}
+          </div>
+        </div>`;
+    }).join('');
+  } else {
+    const color = w.balance < 0 ? 'negative' : w.balance > 0 ? 'positive' : '';
+    const madEquiv = w.currency === 'SAR' ? `<div class="wallet-balance-sub">≈ ${fmt(convert(w.balance,'SAR','MAD'),'MAD')}</div>` : '';
+    balanceHTML = `
+      <div class="wallet-balance-row">
+        <span class="wallet-balance-cur">${w.currency}</span>
+        <div>
+          <div class="wallet-balance-amt ${color}">${fmt(w.balance, w.currency)}</div>
+          ${madEquiv}
+        </div>
+      </div>`;
+  }
+
+  return `
+    <div class="wallet-card">
+      <div class="wallet-card-header">
+        <div class="wallet-card-name">👛 ${w.name}</div>
+        ${w.isMultiCurrency ? '<span class="wallet-badge">متعددة العملات</span>' : ''}
+      </div>
+      <div class="wallet-balances">${balanceHTML}</div>
+      <div class="wallet-card-actions">
+        <button class="btn-success" onclick="openWalletIncomeModal('${w.id}')">+ إيداع</button>
+        <button class="btn-secondary" onclick="editWallet('${w.id}')">✏️ تعديل</button>
+        <button class="btn-danger" onclick="deleteWallet('${w.id}')">🗑️</button>
+      </div>
+    </div>
+  `;
 }
 
-// ══ دوال مساعدة ══
-function resetForm(){
-  document.getElementById("xW").value="";document.getElementById("xC").value="";
-  document.getElementById("xA").value="";document.getElementById("avBox").style.display="none";
-  document.getElementById("btnX").disabled=true;
+// ===== TRIPS =====
+function renderTrips() {
+  const el = document.getElementById('tripsList');
+  if (state.trips.length === 0) {
+    el.innerHTML = `<div class="empty-state"><div class="empty-icon">🗺️</div><p>لا توجد رحلات</p></div>`;
+    return;
+  }
+  el.innerHTML = state.trips.map(t => renderTripCard(t)).join('');
 }
-function rate(cur){
-  if(!D?.currencies)return 1;
-  if(cur==="ريال سعودي"){const m=D.currencies.find(c=>c.currency==="MAD");return m?m.toOther:2.42;}
-  if(cur==="درهم مغربي"){const m=D.currencies.find(c=>c.currency==="MAD");return m?m.toSAR:0.41;}
-  return 1;
-}
-function cv(a,c){return Math.round(a*rate(c));}
-function opp(c){return c==="ريال سعودي"?"درهم مغربي":c==="درهم مغربي"?"ريال سعودي":c;}
-function cs(c){return{"ريال سعودي":"ر.س","درهم مغربي":"د.م","دولار أمريكي":"$","درهم اماراتي":"د.إ"}[c]||c;}
-function fn(n){return n==null?"0":Number(n).toLocaleString("ar-SA");}
-function msg(t,c=""){const e=document.getElementById("toast");e.textContent=t;e.className="toast show "+c;setTimeout(()=>e.className="toast",3000);}
 
-document.addEventListener("DOMContentLoaded",()=>{
-  document.getElementById("xD").valueAsDate=new Date();
-  ["xW","xC","xA"].forEach(id=>document.getElementById(id).addEventListener("change",valForm));
-  load();
+function renderTripCard(t) {
+  const isActive = t.id === state.activeTrip;
+  const startD = t.startDate ? new Date(t.startDate) : null;
+  const endD = t.endDate ? new Date(t.endDate) : null;
+  const duration = (startD && endD) ? Math.ceil((endD - startD) / 86400000) : '-';
+  const tripCur = t.currency || 'SAR';
+  const budgetInCur = convert(parseFloat(t.estimatedBudgetSAR || 0), 'SAR', tripCur);
+
+  return `
+    <div class="trip-card ${isActive ? 'active-trip' : ''}">
+      <div class="trip-card-header">
+        <div>
+          <div class="trip-name">${t.name}</div>
+          ${t.notes ? `<div style="font-size:12px;color:var(--text3);margin-top:4px">${t.notes}</div>` : ''}
+        </div>
+        ${isActive ? '<span class="trip-active-badge">✓ الرحلة النشطة</span>' : ''}
+      </div>
+      <div class="trip-meta">
+        ${t.startDate ? `<span>📅 ${formatDate(t.startDate)}</span>` : ''}
+        ${t.endDate ? `<span>🏁 ${formatDate(t.endDate)}</span>` : ''}
+        ${duration !== '-' ? `<span>⏱️ ${duration} يوم</span>` : ''}
+      </div>
+      ${t.estimatedBudgetSAR > 0 ? `
+        <div class="trip-budget-info">
+          <span class="trip-budget-label">الميزانية: </span>
+          ${fmt(budgetInCur, tripCur)}
+          ${tripCur !== 'SAR' ? `<span class="trip-budget-label"> (${fmt(t.estimatedBudgetSAR,'SAR')})</span>` : ''}
+        </div>` : ''}
+      <div class="trip-card-actions">
+        <button class="btn-primary" onclick="setActiveTrip('${t.id}')">تحديد كنشطة</button>
+        <button class="btn-secondary" onclick="editTrip('${t.id}')">✏️ تعديل</button>
+        <button class="btn-danger" onclick="deleteTrip('${t.id}')">🗑️</button>
+      </div>
+    </div>
+  `;
+}
+
+// ===== CATEGORIES =====
+function renderCategories() {
+  const el = document.getElementById('categoriesList');
+  if (state.categories.length === 0) {
+    el.innerHTML = `<div class="empty-state"><div class="empty-icon">🏷️</div><p>لا توجد فئات</p></div>`;
+    return;
+  }
+  el.innerHTML = state.categories.map(c => `
+    <div class="category-card">
+      <div class="category-icon-big" style="background:${c.color}22">${c.icon}</div>
+      <div class="category-info">
+        <div class="category-name">${c.name}</div>
+      </div>
+      <div class="category-actions">
+        <button class="btn-icon edit" onclick="editCategory('${c.id}')">✏️</button>
+        <button class="btn-icon" onclick="deleteCategory('${c.id}')">🗑️</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ===== SETTINGS =====
+function renderSettings() {
+  const s = state.settings;
+  const rates = [
+    { key: 'MAD_to_SAR', label: '1 درهم مغربي = ؟ ريال' },
+    { key: 'SAR_to_MAD', label: '1 ريال = ؟ درهم مغربي' },
+    { key: 'USD_to_SAR', label: '1 دولار = ؟ ريال' },
+    { key: 'EUR_to_SAR', label: '1 يورو = ؟ ريال' },
+  ];
+  document.getElementById('exchangeRates').innerHTML = rates.map(r => `
+    <div class="exchange-rate-item">
+      <label>${r.label}</label>
+      <input type="number" class="form-control" id="setting_${r.key}" value="${s[r.key] || ''}" step="0.001">
+    </div>
+  `).join('');
+}
+
+async function saveSettings() {
+  const data = {};
+  ['MAD_to_SAR','SAR_to_MAD','USD_to_SAR','EUR_to_SAR'].forEach(k => {
+    const el = document.getElementById('setting_' + k);
+    if (el) data[k] = el.value;
+  });
+  try {
+    await api('POST', { action: 'updateSettings', data });
+    state.settings = { ...state.settings, ...data };
+    showToast('تم حفظ الإعدادات ✅', 'success');
+    renderAll();
+  } catch(e) {
+    showToast('فشل الحفظ', 'error');
+  }
+}
+
+// ===== EXPENSE MODAL =====
+function openExpenseModal(expenseId) {
+  state.editingExpense = expenseId || null;
+  const modal = document.getElementById('expenseModal');
+  const title = document.getElementById('expenseModalTitle');
+
+  // Fill trips
+  document.getElementById('expTripId').innerHTML = state.trips.map(t =>
+    `<option value="${t.id}" ${t.id === state.activeTrip ? 'selected' : ''}>${t.name}</option>`
+  ).join('');
+
+  // Fill categories
+  document.getElementById('expCategory').innerHTML = state.categories.map(c =>
+    `<option value="${c.name}" data-icon="${c.icon}">${c.icon} ${c.name}</option>`
+  ).join('');
+
+  // Fill wallets
+  document.getElementById('expWallet').innerHTML = state.wallets.map(w =>
+    `<option value="${w.name}">${w.name}</option>`
+  ).join('');
+
+  // Set today's date
+  document.getElementById('expDate').value = new Date().toISOString().split('T')[0];
+
+  if (expenseId) {
+    title.textContent = 'تعديل المصروف';
+    const exp = state.expenses.find(e => e.id === expenseId);
+    if (exp) {
+      document.getElementById('expTripId').value = exp.tripId;
+      document.getElementById('expDate').value = exp.date;
+      document.getElementById('expCategory').value = exp.category;
+      document.getElementById('expDesc').value = exp.description || '';
+      document.getElementById('expCurrency').value = exp.currency;
+      document.getElementById('expWallet').value = exp.wallet;
+      document.getElementById('expAmount').value = exp.amount;
+    }
+  } else {
+    title.textContent = 'إضافة مصروف';
+    document.getElementById('expDesc').value = '';
+    document.getElementById('expAmount').value = '';
+    document.getElementById('expCurrency').value = 'SAR';
+  }
+
+  onCurrencyChange();
+  onWalletChange();
+  modal.classList.remove('hidden');
+}
+
+function editExpense(id) { openExpenseModal(id); }
+
+function onCurrencyChange() {
+  updateConversionDisplay();
+  onWalletChange();
+}
+
+function onWalletChange() {
+  const wallet = state.wallets.find(w => w.name === document.getElementById('expWallet').value);
+  const currency = document.getElementById('expCurrency').value;
+  const hint = document.getElementById('walletBalanceHint');
+
+  if (!wallet) { hint.classList.add('hidden'); return; }
+
+  let balance = 0;
+  if (wallet.isMultiCurrency) {
+    balance = (wallet.balances || {})[currency] || 0;
+    hint.textContent = `💰 الرصيد المتاح (${currency}): ${fmt(balance, currency)}`;
+  } else {
+    balance = parseFloat(wallet.balance || 0);
+    // Convert to selected currency for display
+    const dispBalance = convert(balance, wallet.currency, currency);
+    hint.textContent = `💰 الرصيد المتاح: ${fmt(dispBalance, currency)} (${fmt(balance, wallet.currency)})`;
+  }
+  hint.classList.remove('hidden');
+}
+
+function updateCategoryIcon() {} // for potential use
+
+function updateConversionDisplay() {
+  const currency = document.getElementById('expCurrency').value;
+  const amount = parseFloat(document.getElementById('expAmount').value) || 0;
+  const box = document.getElementById('conversionDisplay');
+  if (currency !== 'SAR' && amount > 0) {
+    const sarAmt = convert(amount, currency, 'SAR');
+    const madAmt = currency !== 'MAD' ? convert(amount, currency, 'MAD') : null;
+    box.innerHTML = `≈ ${fmt(sarAmt,'SAR')}${madAmt ? ' | ' + fmt(madAmt,'MAD') : ''}`;
+    box.classList.remove('hidden');
+  } else {
+    box.classList.add('hidden');
+  }
+}
+
+async function saveExpense() {
+  const tripId = document.getElementById('expTripId').value;
+  const date = document.getElementById('expDate').value;
+  const catName = document.getElementById('expCategory').value;
+  const category = state.categories.find(c => c.name === catName);
+  const desc = document.getElementById('expDesc').value;
+  const currency = document.getElementById('expCurrency').value;
+  const wallet = document.getElementById('expWallet').value;
+  const amount = parseFloat(document.getElementById('expAmount').value);
+
+  if (!tripId || !catName || !wallet || !amount || amount <= 0) {
+    showToast('يرجى ملء جميع الحقول المطلوبة', 'error'); return;
+  }
+
+  const madToSar = convert(amount, currency, 'SAR') !== amount ? convert(1, 'MAD', 'SAR') : 0;
+  const sarToMad = convert(1, 'SAR', 'MAD');
+
+  const data = {
+    tripId, date, category: catName, categoryIcon: category?.icon || '📦',
+    description: desc, amount, currency, wallet,
+    madToSar: currency === 'MAD' ? convert(amount, 'MAD', 'SAR') : 0,
+    sarToMad: currency === 'SAR' ? convert(amount, 'SAR', 'MAD') : 0,
+  };
+
+  try {
+    if (state.editingExpense) {
+      await api('POST', { action: 'updateExpense', data: { ...data, id: state.editingExpense, createdAt: state.expenses.find(e=>e.id===state.editingExpense)?.createdAt } });
+      showToast('تم التعديل ✅', 'success');
+    } else {
+      await api('POST', { action: 'addExpense', data });
+      showToast('تمت الإضافة ✅', 'success');
+    }
+    closeModal('expenseModal');
+    // Reload
+    state.expenses = await api('GET', { action: 'getExpenses', tripId: state.activeTrip });
+    state.wallets = await api('GET', { action: 'getWallets' });
+    renderAll();
+  } catch(e) {
+    showToast('فشل الحفظ: ' + e.message, 'error');
+  }
+}
+
+async function deleteExpense(id) {
+  if (!confirm('حذف هذا المصروف؟')) return;
+  try {
+    await api('POST', { action: 'deleteExpense', id });
+    state.expenses = state.expenses.filter(e => e.id !== id);
+    renderAll();
+    showToast('تم الحذف', 'success');
+  } catch(e) {
+    showToast('فشل الحذف', 'error');
+  }
+}
+
+// ===== WALLET MODAL =====
+function openWalletModal(walletId) {
+  state.editingWallet = walletId || null;
+  const modal = document.getElementById('walletModal');
+  document.getElementById('walletModalTitle').textContent = walletId ? 'تعديل المحفظة' : 'إضافة محفظة';
+
+  if (walletId) {
+    const w = state.wallets.find(x => x.id === walletId);
+    if (w) {
+      document.getElementById('walletName').value = w.name;
+      document.getElementById('walletCurrency').value = w.currency;
+      document.getElementById('walletBalance').value = w.balance;
+      document.getElementById('walletMulti').checked = w.isMultiCurrency;
+      toggleMultiCurrencyFields();
+    }
+  } else {
+    document.getElementById('walletName').value = '';
+    document.getElementById('walletBalance').value = '0';
+    document.getElementById('walletMulti').checked = false;
+    toggleMultiCurrencyFields();
+  }
+  modal.classList.remove('hidden');
+}
+
+function editWallet(id) { openWalletModal(id); }
+
+function toggleMultiCurrencyFields() {
+  const isMulti = document.getElementById('walletMulti').checked;
+  document.getElementById('multiCurrencyFields').classList.toggle('hidden', !isMulti);
+}
+function toggleMultiCurrency() {}
+
+async function saveWallet() {
+  const name = document.getElementById('walletName').value.trim();
+  const currency = document.getElementById('walletCurrency').value;
+  const balance = parseFloat(document.getElementById('walletBalance').value) || 0;
+  const isMultiCurrency = document.getElementById('walletMulti').checked;
+
+  if (!name) { showToast('أدخل اسم المحفظة', 'error'); return; }
+
+  const data = { name, currency, balance, isMultiCurrency,
+    balances: isMultiCurrency ? { SAR: 0, MAD: balance, USD: 0, EUR: 0 } : {} };
+
+  try {
+    if (state.editingWallet) {
+      const existing = state.wallets.find(w => w.id === state.editingWallet);
+      await api('POST', { action: 'updateWallet', data: { ...existing, ...data, id: state.editingWallet } });
+    } else {
+      await api('POST', { action: 'addWallet', data });
+    }
+    state.wallets = await api('GET', { action: 'getWallets' });
+    closeModal('walletModal');
+    renderAll();
+    showToast('تم الحفظ ✅', 'success');
+  } catch(e) {
+    showToast('فشل: ' + e.message, 'error');
+  }
+}
+
+async function deleteWallet(id) {
+  if (!confirm('حذف هذه المحفظة؟')) return;
+  try {
+    await api('POST', { action: 'deleteWallet', id });
+    state.wallets = state.wallets.filter(w => w.id !== id);
+    renderAll();
+    showToast('تم الحذف', 'success');
+  } catch(e) {
+    showToast('فشل الحذف', 'error');
+  }
+}
+
+// ===== WALLET INCOME MODAL =====
+function openWalletIncomeModal(walletId) {
+  state.incomeWalletId = walletId;
+  const wallet = state.wallets.find(w => w.id === walletId);
+  if (!wallet) return;
+
+  const info = document.getElementById('walletIncomeInfo');
+  info.innerHTML = `<strong>${wallet.name}</strong> — ${wallet.currency}`;
+
+  const curSel = document.getElementById('incomeCurrency');
+  const curGroup = document.getElementById('incomeCurrencyGroup');
+
+  if (wallet.isMultiCurrency) {
+    curGroup.classList.remove('hidden');
+    curSel.innerHTML = ['SAR','MAD','USD','EUR'].map(c =>
+      `<option value="${c}" ${c === wallet.currency ? 'selected' : ''}>${c}</option>`
+    ).join('');
+  } else {
+    curGroup.classList.add('hidden');
+    curSel.innerHTML = `<option value="${wallet.currency}">${wallet.currency}</option>`;
+  }
+
+  document.getElementById('incomeAmount').value = '';
+  document.getElementById('walletIncomeModal').classList.remove('hidden');
+}
+
+async function saveWalletIncome() {
+  const walletId = state.incomeWalletId;
+  const amount = parseFloat(document.getElementById('incomeAmount').value);
+  const currency = document.getElementById('incomeCurrency').value;
+
+  if (!amount || amount <= 0) { showToast('أدخل مبلغاً صحيحاً', 'error'); return; }
+
+  try {
+    await api('POST', { action: 'addWalletIncome', data: { walletId, amount, currency } });
+    state.wallets = await api('GET', { action: 'getWallets' });
+    closeModal('walletIncomeModal');
+    renderAll();
+    showToast('تم الإيداع ✅', 'success');
+  } catch(e) {
+    showToast('فشل: ' + e.message, 'error');
+  }
+}
+
+// ===== TRIP MODAL =====
+function openTripModal(tripId) {
+  state.editingTrip = tripId || null;
+  document.getElementById('tripModalTitle').textContent = tripId ? 'تعديل الرحلة' : 'إضافة رحلة';
+
+  if (tripId) {
+    const t = state.trips.find(x => x.id === tripId);
+    if (t) {
+      document.getElementById('tripName').value = t.name;
+      document.getElementById('tripStart').value = t.startDate;
+      document.getElementById('tripEnd').value = t.endDate;
+      document.getElementById('tripBudget').value = t.estimatedBudgetSAR;
+      document.getElementById('tripCurrency').value = t.currency || 'SAR';
+      document.getElementById('tripNotes').value = t.notes || '';
+    }
+  } else {
+    document.getElementById('tripName').value = '';
+    document.getElementById('tripStart').value = '';
+    document.getElementById('tripEnd').value = '';
+    document.getElementById('tripBudget').value = '';
+    document.getElementById('tripNotes').value = '';
+  }
+  updateTripDuration();
+  updateBudgetConversion();
+  document.getElementById('tripModal').classList.remove('hidden');
+}
+
+function editTrip(id) { openTripModal(id); }
+
+function updateTripDuration() {
+  const s = document.getElementById('tripStart').value;
+  const e = document.getElementById('tripEnd').value;
+  const el = document.getElementById('tripDuration');
+  if (s && e) {
+    const days = Math.ceil((new Date(e) - new Date(s)) / 86400000);
+    el.textContent = `⏱️ مدة الرحلة: ${days} يوم`;
+  } else {
+    el.textContent = '';
+  }
+}
+
+function updateBudgetConversion() {
+  const budget = parseFloat(document.getElementById('tripBudget').value) || 0;
+  const currency = document.getElementById('tripCurrency').value;
+  const el = document.getElementById('budgetConversion');
+  if (budget > 0 && currency !== 'SAR') {
+    const converted = convert(budget, 'SAR', currency);
+    el.textContent = `${fmt(budget,'SAR')} = ${fmt(converted, currency)}`;
+    el.classList.remove('hidden');
+  } else {
+    el.classList.add('hidden');
+  }
+}
+
+async function saveTrip() {
+  const name = document.getElementById('tripName').value.trim();
+  const startDate = document.getElementById('tripStart').value;
+  const endDate = document.getElementById('tripEnd').value;
+  const estimatedBudgetSAR = parseFloat(document.getElementById('tripBudget').value) || 0;
+  const currency = document.getElementById('tripCurrency').value;
+  const notes = document.getElementById('tripNotes').value;
+
+  if (!name) { showToast('أدخل اسم الرحلة', 'error'); return; }
+
+  const data = { name, startDate, endDate, estimatedBudgetSAR, currency, notes };
+
+  try {
+    if (state.editingTrip) {
+      const existing = state.trips.find(t => t.id === state.editingTrip);
+      await api('POST', { action: 'updateTrip', data: { ...existing, ...data, id: state.editingTrip } });
+    } else {
+      const result = await api('POST', { action: 'addTrip', data });
+      if (!state.activeTrip) state.activeTrip = result.id;
+    }
+    state.trips = await api('GET', { action: 'getTrips' });
+    closeModal('tripModal');
+    renderAll();
+    showToast('تم الحفظ ✅', 'success');
+  } catch(e) {
+    showToast('فشل: ' + e.message, 'error');
+  }
+}
+
+async function deleteTrip(id) {
+  if (!confirm('حذف هذه الرحلة؟')) return;
+  try {
+    await api('POST', { action: 'deleteTrip', id });
+    state.trips = state.trips.filter(t => t.id !== id);
+    if (state.activeTrip === id) { state.activeTrip = state.trips[0]?.id || null; }
+    renderAll();
+    showToast('تم الحذف', 'success');
+  } catch(e) {
+    showToast('فشل الحذف', 'error');
+  }
+}
+
+// ===== CATEGORY MODAL =====
+function openCategoryModal(catId) {
+  state.editingCategory = catId || null;
+  document.getElementById('categoryModalTitle').textContent = catId ? 'تعديل الفئة' : 'إضافة فئة';
+  if (catId) {
+    const c = state.categories.find(x => x.id === catId);
+    if (c) {
+      document.getElementById('catName').value = c.name;
+      document.getElementById('catIcon').value = c.icon;
+      document.getElementById('catColor').value = c.color || '#3B82F6';
+    }
+  } else {
+    document.getElementById('catName').value = '';
+    document.getElementById('catIcon').value = '';
+    document.getElementById('catColor').value = '#3B82F6';
+  }
+  document.getElementById('categoryModal').classList.remove('hidden');
+}
+
+function editCategory(id) { openCategoryModal(id); }
+
+async function saveCategory() {
+  const name = document.getElementById('catName').value.trim();
+  const icon = document.getElementById('catIcon').value.trim() || '📦';
+  const color = document.getElementById('catColor').value;
+
+  if (!name) { showToast('أدخل اسم الفئة', 'error'); return; }
+
+  const data = { name, icon, color };
+  try {
+    if (state.editingCategory) {
+      await api('POST', { action: 'updateCategory', data: { ...data, id: state.editingCategory } });
+    } else {
+      await api('POST', { action: 'addCategory', data });
+    }
+    state.categories = await api('GET', { action: 'getCategories' });
+    closeModal('categoryModal');
+    renderAll();
+    showToast('تم الحفظ ✅', 'success');
+  } catch(e) {
+    showToast('فشل: ' + e.message, 'error');
+  }
+}
+
+async function deleteCategory(id) {
+  if (!confirm('حذف هذه الفئة؟')) return;
+  try {
+    await api('POST', { action: 'deleteCategory', id });
+    state.categories = state.categories.filter(c => c.id !== id);
+    renderAll();
+    showToast('تم الحذف', 'success');
+  } catch(e) {
+    showToast('فشل الحذف', 'error');
+  }
+}
+
+// ===== NAVIGATION =====
+function showPage(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  document.querySelector(`[data-page="${page}"]`)?.classList.add('active');
+
+  const titles = { dashboard:'لوحة التحكم', expenses:'المصاريف', wallets:'المحافظ', trips:'الرحلات', categories:'الفئات', settings:'الإعدادات' };
+  document.getElementById('pageTitle').textContent = titles[page] || page;
+
+  if (window.innerWidth <= 768) closeSidebar();
+}
+
+function toggleSidebar() {
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('sidebarOverlay');
+  sidebar.classList.toggle('open');
+  overlay.classList.toggle('active');
+}
+
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebarOverlay').classList.remove('active');
+}
+
+// ===== MODALS =====
+function closeModal(id) {
+  document.getElementById(id).classList.add('hidden');
+}
+
+// ===== HELPERS =====
+function formatDate(dateStr) {
+  if (!dateStr) return '';
+  try {
+    const d = new Date(dateStr);
+    return d.toLocaleDateString('ar-SA', { year:'numeric', month:'short', day:'numeric' });
+  } catch { return dateStr; }
+}
+
+let toastTimer;
+function showToast(msg, type) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'toast ' + (type || '');
+  el.classList.remove('hidden');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.add('hidden'), 3000);
+}
+
+// Listen for trip/budget date changes
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('tripStart')?.addEventListener('change', updateTripDuration);
+  document.getElementById('tripEnd')?.addEventListener('change', updateTripDuration);
+  document.getElementById('expAmount')?.addEventListener('input', updateConversionDisplay);
+  init();
 });
-</script>
+
+  </script>
 </body>
 </html>
