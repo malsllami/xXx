@@ -1387,23 +1387,31 @@ function changeScript() {
 }
 
 // ===== API =====
+// كل الطلبات عبر GET لتجنب مشكلة CORS مع Google Apps Script
 async function api(method, params) {
+  let qs;
   if (method === 'GET') {
-    const qs = Object.entries(params).map(([k,v]) => `${k}=${encodeURIComponent(v)}`).join('&');
-    const res = await fetch(`${SCRIPT_URL}?${qs}`);
-    const data = await res.json();
-    if (data.error) throw new Error(data.error);
-    return data;
+    qs = Object.entries(params).map(([k,v]) => `${encodeURIComponent(k)}=${encodeURIComponent(v)}`).join('&');
   } else {
-    const res = await fetch(SCRIPT_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(params),
-    });
-    const data = await res.json();
-    if (data.error) throw new Error(data.error);
-    return data;
+    // حول POST إلى GET
+    const action = params.action;
+    qs = `action=${encodeURIComponent(action)}`;
+    // إذا فيه id مباشر (مثل deleteTrip, deleteExpense)
+    if (params.id !== undefined) {
+      qs += `&id=${encodeURIComponent(params.id)}`;
+    }
+    // إذا فيه data (مثل addTrip, updateWallet)
+    if (params.data !== undefined) {
+      qs += `&payload=${encodeURIComponent(JSON.stringify(params.data))}`;
+    }
   }
+  const url = `${SCRIPT_URL}?${qs}`;
+  const res = await fetch(url);
+  const text = await res.text();
+  let data;
+  try { data = JSON.parse(text); } catch(e) { throw new Error('Response not JSON: ' + text.substring(0,200)); }
+  if (data.error) throw new Error(data.error);
+  return data;
 }
 
 async function loadAllData() {
